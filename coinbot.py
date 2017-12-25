@@ -33,6 +33,9 @@ if __name__ == '__main__':
     out = 3768 + 2000 + 8888 + 8338
     print 'Out:     %d' % out
 
+    USD_gate, cash_gate = getGateInfo(), 0
+    print 'gate.io: %s, %s' % (USD_gate, cang(cash_gate, USD_gate))
+
     USD_gdax, cash_gdax = coinbase.getUSDBalance()
     print 'GDAX:    %s, %s' % (USD_gdax, cang(cash_gdax, USD_gdax))
 
@@ -41,9 +44,6 @@ if __name__ == '__main__':
 
     USD_binance, cash_binance = binance.get_USD_balance()
     print 'Binance: %s, %s' % (USD_binance, cang(cash_binance, USD_binance))
-
-    USD_gate, cash_gate = getGateInfo(), 0
-    print 'gate.io: %s, %s' % (USD_gate, cang(cash_gate, USD_gate))
 
     real_total = USD_bittrex + USD_gdax + USD_binance + USD_gate
     USD_total = int(real_total + out)
