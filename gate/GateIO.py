@@ -1,14 +1,23 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import json
 from .HttpUtil import getSign,httpGet,httpPost
 
 class GateIO:
 
-    def __init__(self,apikey,secretkey):
+    def __init__(self, apikey, secretkey):
         self.__url = 'data.gate.io'
         self.__apikey = apikey
         self.__secretkey = secretkey
+
+    def get_USD_balance(self):
+        balances = json.loads(self.balances())['available']
+        smt, fil = float(balances['SMT']), float(balances['FIL'])
+        smt_price = float(self.ticker('smt_eth')['last']) * float(self.ticker('eth_usdt')['last'])
+        fil_price = float(self.ticker('FIL_usdt')['last'])
+        total = smt * smt_price + fil * fil_price
+        return total
 
     #所有交易对
     def pairs(self):
