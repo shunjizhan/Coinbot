@@ -1,2 +1,2 @@
 # Coinbot
-trading bot
+trading bot 1.0
