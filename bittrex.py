@@ -250,6 +250,35 @@ class Bittrex(object):
         """
         return self.api_query('getbalance', {'currency': currency})
 
+    def get_USD_balance(self, BTC_price):
+        balances = self.get_balances()
+        coinNums = {}
+        for coin in balances['result']:
+            coinName = coin['Currency']
+            num = coin['Balance']
+            coinNums[coinName] = num
+
+        BTC = 0
+        USD = 0
+        iteration = 0
+        coinCount = len(coinNums)
+        for coin in coinNums:
+            iteration += 1
+            if (iteration % 20 == 0):
+                print(str(iteration) + '/' + str(coinCount))
+
+            coinNum = float(coinNums[coin])
+            if coin == 'USDT':
+                USD += coinNum
+            elif coin == 'BTC':
+                BTC += coinNum
+            else:
+                ticker = self.get_ticker('BTC-' + coin)['result']
+                if (ticker is not None and ticker['Last'] is not None):
+                    BTC += float(ticker['Last']) * coinNum
+
+        return BTC * BTC_price + USD
+
     def get_deposit_address(self, currency):
         """
         Used to generate or retrieve an address for a specific currency
