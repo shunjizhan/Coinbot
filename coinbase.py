@@ -48,9 +48,9 @@ class Coinbase:
         for acc in account:
             coin = acc['currency']
             num = float(acc['balance'])
-            if (coin == 'BCH'):
-                total_USD += num * 2888
-            elif (coin == 'USD'):
+            # if (coin == 'BCH'):
+            #     total_USD += num * 2888
+            if (coin == 'USD'):
                 cash = num * 1
                 total_USD += num * 1
             else:
