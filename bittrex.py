@@ -259,17 +259,17 @@ class Bittrex(object):
             coinNums[coinName] = num
 
         BTC = 0
-        USD = 0
+        cash = 0
         iteration = 0
         coinCount = len(coinNums)
         for coin in coinNums:
             iteration += 1
-            if (iteration % 20 == 0):
+            if iteration % 200 == 0:
                 print(str(iteration) + '/' + str(coinCount))
 
             coinNum = float(coinNums[coin])
             if coin == 'USDT':
-                USD += coinNum
+                cash += coinNum
             elif coin == 'BTC':
                 BTC += coinNum
             else:
@@ -277,7 +277,7 @@ class Bittrex(object):
                 if (ticker is not None and ticker['Last'] is not None):
                     BTC += float(ticker['Last']) * coinNum
 
-        return BTC * BTC_price + USD
+        return int(BTC * BTC_price + cash), int(cash)
 
     def get_deposit_address(self, currency):
         """

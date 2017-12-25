@@ -2,6 +2,10 @@ from bittrex import Bittrex
 from coinbase import Coinbase
 
 
+def cang(cash, total):
+    return str(100 - int(cash * 100 / total)) + '%'
+
+
 if __name__ == '__main__':
     coinbase = Coinbase(
         'cf3a26182673f04a6c14b525cf486538',
@@ -13,21 +17,24 @@ if __name__ == '__main__':
         "ee05e7bde1ed461c806793a9289d370b"
     )
 
-    USD_gdax = coinbase.getUSDBalance()
-    print USD_gdax
+    out = 3768 + 2000 + 8888
+    print 'out:     %d' % out
 
-    USD_bittrex = bittrex.get_USD_balance(coinbase.getPrice('BTC'))
-    print USD_bittrex
-    
-    out = 3768 + 2000 + 8888 + 2100         # 2100 in gate.io
-    total = USD_bittrex + USD_gdax + out
+    USD_gdax, cash_gdax = coinbase.getUSDBalance()
+    print 'GDAX:    %s, %s' % (USD_gdax, cang(cash_gdax, USD_gdax))
 
-    print total
+    USD_bittrex, cash_bittrex = bittrex.get_USD_balance(coinbase.getPrice('BTC'))
+    print 'Bittrex: %s, %s' % (USD_bittrex, cang(cash_bittrex, USD_bittrex))
 
-    # print 'Bittrex: ' + str(USD_bittrex) + ' ' + str(100 - int(USDT * 100 / USD_bittrex)) + '%'
-    # print 'GDAX:    ' + str(USD_gdax)    + ' ' + str(100 - int(USD * 100 / USD_gdax)) + '%'
-    # print 'out:     ' + str(out)   
-    # print 'Total:   ' + str(total)       + ' ' + str(100 - int((USDT + USD) * 100 / (total - (3768 + 2000 + 8888 + 10000)))) + '%'
+    USD_gate, cash_gate = 2100, 0
+    print 'gate.io: %s, %s' % (USD_gate, cang(cash_gate, USD_gate))
+
+    real_total = USD_bittrex + USD_gdax + USD_gate
+    USD_total = real_total + out
+    cash_total = cash_gdax + cash_bittrex + cash_gate
+    print 'Total:   %s, %s' % (USD_total, cang(cash_total, real_total))
+
+
 
 
 

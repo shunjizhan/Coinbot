@@ -44,17 +44,19 @@ class Coinbase:
         account = requests.get(self.api_base_url + 'accounts', auth=self.auth).json()
         # pp.pprint(account)
         total_USD = 0
+        cash = 0
         for acc in account:
             coin = acc['currency']
             num = float(acc['balance'])
             if (coin == 'BCH'):
                 total_USD += num * 2888
             elif (coin == 'USD'):
+                cash = num * 1
                 total_USD += num * 1
             else:
                 total_USD += num * self.getPrice(coin)
 
-        return total_USD
+        return int(total_USD), int(cash)
 
 
 
