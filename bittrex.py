@@ -264,6 +264,8 @@ class Bittrex(object):
         coinCount = len(coinNums)
         for coin in coinNums:
             iteration += 1
+            if iteration == 3:
+                break
             if iteration % 200 == 0:
                 print(str(iteration) + '/' + str(coinCount))
 
