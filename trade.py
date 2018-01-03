@@ -15,7 +15,7 @@ if __name__ == '__main__':
         "ee05e7bde1ed461c806793a9289d370b"
     )
 
-    dontTouch = {'XRP', 'XEM', 'BTC', 'DOGE', 'SC', 'NEO', 'ZEC', 'BTG', 'MONA', 'WINGS', 'USDT', '1ST', '2GIVE'}
+    dontTouch = {'XRP', 'XEM', 'BTC', 'DOGE', 'SC', 'NEO', 'ZEC', 'BTG', 'MONA', 'WINGS', 'USDT'}
     allCoins = bittrex.get_balances()['result']
 
     for coin in allCoins:

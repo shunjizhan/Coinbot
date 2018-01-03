@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     real_total = USD_bittrex + USD_gdax + USD_binance + USD_gate
     USD_total = int(real_total + out)
-    cash_total = cash_gdax + cash_bittrex + cash_gate
+    cash_total = cash_gdax + cash_bittrex + cash_gate + cash_binance
     print 'Total:   %s, %s, %.3f' % (USD_total, cang(cash_total, real_total), USD_total / 38888.0)
 
 

@@ -36,7 +36,7 @@ class Binance:
                     BTC += price * num
 
         BTC_price = float(self.binance.get_order_book(symbol='BTCUSDT')['bids'][0][0])
-        return int(BTC * BTC_price), int(cash)
+        return int(BTC * BTC_price + cash), int(cash)
 
 
 class Client(object):
