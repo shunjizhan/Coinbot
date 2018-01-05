@@ -266,7 +266,7 @@ class Bittrex(object):
             iteration += 1
             if iteration == 300:
                 break
-            if iteration % 200 == 0:
+            if iteration % 500 == 0:
                 print(str(iteration) + '/' + str(coinCount))
 
             coinNum = float(coinNums[coin])

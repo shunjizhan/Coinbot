@@ -15,14 +15,14 @@ def getGateInfo():
 
 if __name__ == '__main__':
     coinbase = Coinbase(
-        'cf3a26182673f04a6c14b525cf486538',
-        'b/gZLAP70oEiGzmSPA998WWTXUY0X+Ip3eDPPNTRVlx+G9Tdv/cLBIQ8mLp3Le/7VzTgFPp/+8SrQtqBp0NoVQ==',
-        'Ss132465798'
+        'ad8327c971400a583a511c8b44153c3b',
+        '4oc5G42pHNRGf6fxBhL+JE3bwKH54SothrVzCVwgBD7dxdj/PLWz2rrBYx3f9V3/lh3Cj2vLzMfsXIvmv5W1mg==',
+        '5rngcof6sug'
     )
 
     bittrex = Bittrex(
-        "c439546abe26493ebb52cce3d9a4eeac",
-        "ee05e7bde1ed461c806793a9289d370b"
+        "f4a53cc750174691bb8a26adf5b9d732",
+        "74cdede4f6a34ae88e782b339fdf2830"
     )
 
     binance = Binance(
@@ -36,7 +36,8 @@ if __name__ == '__main__':
     USD_gate, cash_gate = getGateInfo(), 0
     print 'gate.io: %s, %s' % (USD_gate, cang(cash_gate, USD_gate))
 
-    USD_gdax, cash_gdax = coinbase.getUSDBalance()
+    # USD_gdax, cash_gdax = coinbase.getUSDBalance()
+    USD_gdax, cash_gdax = 60419, 60419
     print 'GDAX:    %s, %s' % (USD_gdax, cang(cash_gdax, USD_gdax))
 
     USD_bittrex, cash_bittrex = bittrex.get_USD_balance(coinbase.getPrice('BTC'))
