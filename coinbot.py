@@ -1,7 +1,11 @@
 import pprint as pp
-from bittrex import Bittrex
-from coinbase import Coinbase
-from binance import Binance
+from bittrex.bittrex import Bittrex
+from coinbase.coinbase import Coinbase
+from binance.binance import Binance
+
+
+def connect_success(exchange):
+    print 'connected %s' % exchange
 
 
 def cang(cash, total):
@@ -9,47 +13,105 @@ def cang(cash, total):
 
 
 def getGateInfo():
-    with open('gate.txt') as f:
+    with open('gate/gate.txt') as f:
         return int(float(f.read()))
 
 
-if __name__ == '__main__':
-    coinbase = Coinbase(
-        'ad8327c971400a583a511c8b44153c3b',
-        '4oc5G42pHNRGf6fxBhL+JE3bwKH54SothrVzCVwgBD7dxdj/PLWz2rrBYx3f9V3/lh3Cj2vLzMfsXIvmv5W1mg==',
-        '5rngcof6sug'
-    )
+class Coinbot:
+    def __init__(self):
+        self.connect_exchanges()
+        self.BTC_price = self.coinbase.get_BTC_price()
 
-    bittrex = Bittrex(
-        "f4a53cc750174691bb8a26adf5b9d732",
-        "74cdede4f6a34ae88e782b339fdf2830"
-    )
+    def connect_exchanges(self):
+        self.coinbase = Coinbase(
+            'ad8327c971400a583a511c8b44153c3b',
+            '4oc5G42pHNRGf6fxBhL+JE3bwKH54SothrVzCVwgBD7dxdj/PLWz2rrBYx3f9V3/lh3Cj2vLzMfsXIvmv5W1mg==',
+            '5rngcof6sug'
+        )
+        connect_success('coinbase')
 
-    binance = Binance(
-        'N0VUiMGmgZRXsEJyEEyXNITGZAELNfPIZyzzcTOSwV7q9MhZt6Mt7SFFdzERZgB5',
-        '7A6ZwSIwsfdWVnTSgK0Gc2JzAU2k5snEHf9DQuyM7VCNC4FykC14qxNxQmmyUhDU'
-    )
+        self.bittrex = Bittrex(
+            "f4a53cc750174691bb8a26adf5b9d732",
+            "74cdede4f6a34ae88e782b339fdf2830"
+        )
+        connect_success('bittrex')
 
-    out = 3768 + 2000 + 8888 + 8338
-    print 'Out:     %d' % out
+        self.binance = Binance(
+            'N0VUiMGmgZRXsEJyEEyXNITGZAELNfPIZyzzcTOSwV7q9MhZt6Mt7SFFdzERZgB5',
+            '7A6ZwSIwsfdWVnTSgK0Gc2JzAU2k5snEHf9DQuyM7VCNC4FykC14qxNxQmmyUhDU'
+        )
+        connect_success('binance')
 
-    USD_gate, cash_gate = getGateInfo(), 0
-    print 'gate.io: %s, %s' % (USD_gate, cang(cash_gate, USD_gate))
+    def get_USD_balance(self):
+        out = 3768 + 2000 + 8888 + 8338
+        print 'Out:     %d' % out
 
-    # USD_gdax, cash_gdax = coinbase.getUSDBalance()
-    USD_gdax, cash_gdax = 60419, 60419
-    print 'GDAX:    %s, %s' % (USD_gdax, cang(cash_gdax, USD_gdax))
+        USD_gate, cash_gate = getGateInfo(), 0
+        print 'gate.io: %s, %s' % (USD_gate, cang(cash_gate, USD_gate))
 
-    USD_bittrex, cash_bittrex = bittrex.get_USD_balance(coinbase.getPrice('BTC'))
-    print 'Bittrex: %s, %s' % (USD_bittrex, cang(cash_bittrex, USD_bittrex))
+        USD_gdax, cash_gdax = self.coinbase.get_USD_balance()
+        # USD_gdax, cash_gdax = 60419, 60419
+        print 'GDAX:    %s, %s' % (USD_gdax, cang(cash_gdax, USD_gdax))
 
-    USD_binance, cash_binance = binance.get_USD_balance()
-    print 'Binance: %s, %s' % (USD_binance, cang(cash_binance, USD_binance))
+        USD_bittrex, cash_bittrex = self.bittrex.get_USD_balance(self.coinbase.getPrice('BTC'))
+        print 'Bittrex: %s, %s' % (USD_bittrex, cang(cash_bittrex, USD_bittrex))
 
-    real_total = USD_bittrex + USD_gdax + USD_binance + USD_gate
-    USD_total = int(real_total + out)
-    cash_total = cash_gdax + cash_bittrex + cash_gate + cash_binance
-    print 'Total:   %s, %s, %.3f' % (USD_total, cang(cash_total, real_total), USD_total / 38888.0)
+        USD_binance, cash_binance = self.binance.get_USD_balance()
+        print 'Binance: %s, %s' % (USD_binance, cang(cash_binance, USD_binance))
+
+        real_total = USD_bittrex + USD_gdax + USD_binance + USD_gate
+        USD_total = int(real_total + out)
+        cash_total = cash_gdax + cash_bittrex + cash_gate + cash_binance
+        print 'Total:   %s, %s, %.3f' % (USD_total, cang(cash_total, real_total), USD_total / 38888.0)
+
+    def buy_all(self, price=200):
+        dontTouch = {'XRP', 'XEM', 'BTC', 'DOGE', 'SC', 'NEO', 'ZEC', 'BTG', 'MONA', 'WINGS', 'USDT'}
+        allCoins = self.bittrex.get_balances()['result']
+
+        for coin in allCoins:
+            name = coin['Currency']
+            if (name not in dontTouch):
+                market = 'BTC-' + name
+                ticker = self.bittrex.get_ticker(market)['result']
+                if (ticker is not None and ticker['Ask'] is not None):
+                    price = float(ticker['Ask']) * 1.05
+                    quantity = 0.013 / price
+                    result = self.bittrex.buy_limit(market, quantity, price)
+                    if result is not None and result['result'] is not None:
+                        details = self.bittrex.get_order(result['result']['uuid'])
+                        USD = float(details['result']['Price']) * 15781
+
+                        print name, int(USD),
+                        # break
+
+    def sell_all(self):
+        dontTouch = {'XRP', 'XEM', 'BTC', 'DOGE', 'SC', 'NEO', 'ZEC', 'BTG', 'MONA', 'WINGS', 'USDT'}
+        allCoins = self.bittrex.get_balances()['result']
+
+        count = 0
+        total = 0
+        for coin in allCoins:
+            name = coin['Currency']
+            balance = coin['Balance']
+            if (name not in dontTouch and balance > 0):
+                market = 'BTC-' + name
+                ticker = self.bittrex.get_ticker(market)['result']
+                if (ticker is not None and ticker['Bid'] is not None):
+                    price = float(ticker['Bid']) * 0.95
+                    result = self.bittrex.sell_limit(market, balance, price)
+                    if result is not None and result['result'] is not None:
+                        details = self.bittrex.get_order(result['result']['uuid'])
+                        USD = float(details['result']['Price']) * 15781
+                        percent = USD / 40.0
+
+                        count += 1
+                        total += USD
+
+                        print name, int(USD),
+                        print '%2f' % percent
+                        # break
+        print total, total / count
+
 
 
 

@@ -33,14 +33,17 @@ class Coinbase:
         self.api_base_url = 'https://api.gdax.com/'
         self.auth = CoinbaseAuth(api_key, secret_key, passphrase)
 
-    def getPrice(self, coin):
+    def get_price(self, coin):
         if coin not in {'BTC', 'ETH', 'BCH', 'LTC'}:
             raise Exception('this coin (%s) is not in GDAX!' % coin)
 
         api_url = self.api_base_url + 'products/%s-USD/book?level=1' % coin
         return float(requests.get(api_url, auth=self.auth).json()['bids'][0][0])
 
-    def getUSDBalance(self):
+    def get_BTC_price(self):
+        return self.get_price('BTC')
+
+    def get_USD_balance(self):
         account = requests.get(self.api_base_url + 'accounts', auth=self.auth).json()
         # pp.pprint(account)
         total_USD = 0
@@ -54,7 +57,7 @@ class Coinbase:
                 cash = num * 1
                 total_USD += num * 1
             else:
-                total_USD += num * self.getPrice(coin)
+                total_USD += num * self.get_price(coin)
 
         return int(total_USD), int(cash)
 
