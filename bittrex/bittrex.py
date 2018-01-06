@@ -251,25 +251,20 @@ class Bittrex(object):
         return self.api_query('getbalance', {'currency': currency})
 
     def get_USD_balance(self, BTC_price):
-        balances = self.get_balances()
-        coinNums = {}
-        for coin in balances['result']:
-            coinName = coin['Currency']
-            num = coin['Balance']
-            coinNums[coinName] = num
+        all_coins = self.get_coin_balance()
 
         BTC = 0
         cash = 0
         iteration = 0
-        coinCount = len(coinNums)
-        for coin in coinNums:
+        coinCount = len(all_coins)
+        for coin in all_coins:
             iteration += 1
             if iteration == 300:
                 break
             if iteration % 500 == 0:
                 print(str(iteration) + '/' + str(coinCount))
 
-            coinNum = float(coinNums[coin])
+            coinNum = float(all_coins[coin])
             if coin == 'USDT':
                 cash += coinNum
             elif coin == 'BTC':
@@ -280,6 +275,15 @@ class Bittrex(object):
                     BTC += float(ticker['Last']) * coinNum
 
         return int(BTC * BTC_price + cash), int(cash)
+
+    def get_coin_balance(self):
+        balances = self.get_balances()
+        coins = {}
+        for coin in balances['result']:
+            coinName = coin['Currency']
+            num = coin['Balance']
+            coins[coinName] = num
+        return coins
 
     def get_deposit_address(self, currency):
         """

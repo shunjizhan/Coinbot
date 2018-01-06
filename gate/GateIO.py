@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import json
-from .HttpUtil import getSign,httpGet,httpPost
+from HttpUtil import getSign,httpGet,httpPost
 
 class GateIO:
 
@@ -12,6 +12,7 @@ class GateIO:
         self.__secretkey = secretkey
 
     def get_USD_balance(self):
+        # print (self.balances())
         balances = json.loads(self.balances())['available']
         smt, fil = float(balances['SMT']), float(balances['FIL'])
         smt_price = float(self.ticker('smt_eth')['last']) * float(self.ticker('eth_usdt')['last'])

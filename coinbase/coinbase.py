@@ -51,8 +51,6 @@ class Coinbase:
         for acc in account:
             coin = acc['currency']
             num = float(acc['balance'])
-            # if (coin == 'BCH'):
-            #     total_USD += num * 2888
             if (coin == 'USD'):
                 cash = num * 1
                 total_USD += num * 1
@@ -61,6 +59,14 @@ class Coinbase:
 
         return int(total_USD), int(cash)
 
+    def get_coin_balance(self):
+        account = requests.get(self.api_base_url + 'accounts', auth=self.auth).json()
+        coins = {}
+        for acc in account:
+            name = acc['currency']
+            num = float(acc['balance'])
+            coins[name] = num
+        return coins
 
 
 

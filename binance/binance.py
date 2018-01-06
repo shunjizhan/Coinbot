@@ -21,8 +21,8 @@ class Binance:
     def get_USD_balance(self):
         BTC = 0
         cash = 0
-        coinNums = self.binance.get_account()['balances']
-        for coin in coinNums:
+        all_coins = self.binance.get_account()['balances']
+        for coin in all_coins:
             num = float(coin['free']) + float(coin['locked'])
             if num > 0:
                 coinName = coin['asset']
@@ -37,6 +37,17 @@ class Binance:
 
         BTC_price = float(self.binance.get_order_book(symbol='BTCUSDT')['bids'][0][0])
         return int(BTC * BTC_price + cash), int(cash)
+
+    def get_coin_balance(self):
+        all_coins = {}
+        balances = self.binance.get_account()['balances']
+        for coin in balances:
+            num = float(coin['free']) + float(coin['locked'])
+            if num > 0:
+                coinName = coin['asset']
+                all_coins[coinName] = num
+        return all_coins
+
 
 
 class Client(object):

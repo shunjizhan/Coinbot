@@ -1,4 +1,4 @@
-from gate.GateIO import GateIO
+from GateIO import GateIO
 
 gate = GateIO(
     '822FF026-1E61-47A7-92E0-780E0FD27268',
@@ -6,5 +6,5 @@ gate = GateIO(
 )
 
 balance = int(gate.get_USD_balance())
-with open('gate.txt', 'w') as out:
+with open('gate/gate.txt', 'w') as out:
     out.write(str(balance))
