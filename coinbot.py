@@ -26,7 +26,6 @@ def combine(d1, d2):
     return d1
 
 
-
 class Coinbot:
     def __init__(self):
         self.connect_exchanges()
@@ -78,11 +77,10 @@ class Coinbot:
         real_total = USD_bittrex + USD_gdax + USD_binance + USD_gate
         USD_total = int(real_total + out)
         cash_total = cash_gdax + cash_bittrex + cash_gate + cash_binance
-        print 'Total:   %s, %s, %.3f' % (USD_total, cang(cash_total, real_total), USD_total / 38888.0)
+        print 'Total:   %s, %s, %.3f' % (USD_total, cang(cash_total, real_total), USD_total / 38800.0)
 
     def get_all_coins(self):
         coins = {}
-        # print self.coinbase.get_coin_balance()
         combine(coins, self.coinbase.get_coin_balance())
         combine(coins, self.bittrex.get_coin_balance())
         combine(coins, self.binance.get_coin_balance())

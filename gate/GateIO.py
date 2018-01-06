@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import json
-from HttpUtil import getSign,httpGet,httpPost
+from HttpUtil import httpGet, httpPost
+
 
 class GateIO:
-
     def __init__(self, apikey, secretkey):
         self.__url = 'data.gate.io'
         self.__apikey = apikey
@@ -13,11 +13,18 @@ class GateIO:
 
     def get_USD_balance(self):
         # print (self.balances())
+        ETH_price = float(self.ticker('eth_usdt')['last'])
         balances = json.loads(self.balances())['available']
-        smt, fil = float(balances['SMT']), float(balances['FIL'])
-        smt_price = float(self.ticker('smt_eth')['last']) * float(self.ticker('eth_usdt')['last'])
-        fil_price = float(self.ticker('FIL_usdt')['last'])
-        total = smt * smt_price + fil * fil_price
+        total = 0
+        for coin in balances:
+            if coin not in {'ETH', 'USDT'}:
+                num = float(balances[coin])
+                if coin == 'FIL':
+                    price = float(self.ticker('FIL_usdt')['last'])
+                else:
+                    pair = '%s_eth' % coin
+                    price = float(self.ticker(pair)['last']) * ETH_price
+                total += price * num
         return total
 
     #所有交易对
