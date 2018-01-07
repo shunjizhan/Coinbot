@@ -16,12 +16,12 @@ elif six.PY3:
 
 class Binance:
     def __init__(self, key, secret):
-        self.binance = Client(key, secret)
+        self.client = Client(key, secret)
 
     def get_USD_balance(self):
         BTC = 0
         cash = 0
-        all_coins = self.binance.get_account()['balances']
+        all_coins = self.client.get_account()['balances']
         for coin in all_coins:
             num = float(coin['free']) + float(coin['locked'])
             if num > 0:
@@ -32,15 +32,15 @@ class Binance:
                     cash = num
                 elif coinName not in {'SBTC', 'BCX', 'ETF'}:
                     pair = coinName + 'BTC'
-                    price = float(self.binance.get_order_book(symbol=pair)['bids'][0][0])
+                    price = float(self.client.get_order_book(symbol=pair)['bids'][0][0])
                     BTC += price * num
 
-        BTC_price = float(self.binance.get_order_book(symbol='BTCUSDT')['bids'][0][0])
+        BTC_price = float(self.client.get_order_book(symbol='BTCUSDT')['bids'][0][0])
         return int(BTC * BTC_price + cash), int(cash)
 
     def get_coin_balance(self):
         all_coins = {}
-        balances = self.binance.get_account()['balances']
+        balances = self.client.get_account()['balances']
         for coin in balances:
             num = float(coin['free']) + float(coin['locked'])
             if num > 0:
@@ -48,10 +48,19 @@ class Binance:
                 all_coins[coinName] = num
         return all_coins
 
+    # def get_coin_full_balance(self, coin_balance):
+    #     BTC_price = float(self.client.get_order_book(symbol='BTCUSDT')['bids'][0][0])
+    #     res = {}
+    #     for coin, num in coin_balance.items():
+    #         price = float(self.client.get_order_book(symbol=pair)['bids'][0][0])
+    #         BTC_value = BTC_price * num
+    #         USD_value = BTC_value * BTC_price
 
 
+# ------------------------------------------------------------ #
+# ------------------------- API Wrapper ---------------------- #
+# ------------------------------------------------------------ #
 class Client(object):
-
     API_URL = 'https://api.binance.com/api'
     WITHDRAW_API_URL = 'https://api.binance.com/wapi'
     WEBSITE_URL = 'https://www.binance.com'

@@ -30,6 +30,7 @@ class Coinbot:
     def __init__(self):
         self.connect_exchanges()
         self.BTC_price = self.coinbase.get_BTC_price()
+        self.dontTouch = {'XRP', 'XEM', 'BTC', 'DOGE', 'SC', 'NEO', 'ZEC', 'BTG', 'MONA', 'WINGS', 'USDT', 'IOTA', 'EOS', 'QTUM', 'ADA', 'XLM', 'LSK', 'BTS', 'XMR', 'DASH', 'SNT', 'BCC', 'BCH', 'SBTC', 'BCX', 'ETF', 'LTC', 'ETH'}
 
     def connect_exchanges(self):
         print ' '
@@ -47,8 +48,8 @@ class Coinbot:
         connect_success('bittrex')
 
         self.binance = Binance(
-            'N0VUiMGmgZRXsEJyEEyXNITGZAELNfPIZyzzcTOSwV7q9MhZt6Mt7SFFdzERZgB5',
-            '7A6ZwSIwsfdWVnTSgK0Gc2JzAU2k5snEHf9DQuyM7VCNC4FykC14qxNxQmmyUhDU'
+            'siZx8vFmPgDkWXfv6KhvWB3QDTJo5NuV6NDu8FeALDBu6BhGbxLQSPNAfXTOmdso',
+            'yLfj5QyStnjrH0qUmRLlAF64BQIujsgADupH3B5nWmTIYhCXQddGzUhW6s2LVhBN'
         )
         connect_success('binance')
 
@@ -87,11 +88,23 @@ class Coinbot:
 
         pp.pprint(coins)
 
+    def get_bittrex_profit_ratio(self, base):
+        coins = self.bittrex.get_coin_balance()
+        for coin, count in coins.items():
+            ticker = self.bittrex.get_ticker('BTC-' + coin)['result']
+            percent_sum, coin_count = 0.0, 0
+            if (ticker is not None and ticker['Last'] is not None):
+                percent = count * float(ticker['Last']) * self.BTC_price / base
+                percent_sum += percent
+                coin_count += 1
+                print coin, '%.2f' % percent
+        print percent_sum / coin_count
+
     # --------------------------------------------------------------------------------------------- #
     # ----------------------------------------- Trade --------------------------------------------- #
     # --------------------------------------------------------------------------------------------- #
     def buy_all_bittrex(self, USD_total=200.0):
-        dontTouch = {'XRP', 'XEM', 'BTC', 'DOGE', 'SC', 'NEO', 'ZEC', 'BTG', 'MONA', 'WINGS', 'USDT'}
+        dontTouch = self.dontTouch
         allCoins = self.bittrex.get_balances()['result']
 
         for coin in allCoins:
@@ -112,7 +125,7 @@ class Coinbot:
                         # break
 
     def sell_all_bittrex(self):
-        dontTouch = {'XRP', 'XEM', 'BTC', 'DOGE', 'SC', 'NEO', 'ZEC', 'BTG', 'MONA', 'WINGS', 'USDT'}
+        dontTouch = self.dontTouch
         allCoins = self.bittrex.get_balances()['result']
 
         count = 0
@@ -135,10 +148,48 @@ class Coinbot:
                         total += USD
 
                         print name, int(USD),
-                        print '%2f' % percent
+                        print '%.2f' % percent
                         # break
         print total, total / count
 
+    def buy_all_binance(self, USD_total=200.0):
+        dontTouch = self.dontTouch
+        balances = self.binance.client.get_account()['balances']
+
+        # pp.pprint(balances)
+        for coin in balances:
+            coinName = coin['asset']
+            if coinName not in (dontTouch | {'BNC', 'ICO', '123', '456', 'BTM', 'PAY', 'ELC', 'LRX', 'FID'}):
+                num = float(coin['free']) + float(coin['locked'])
+                if num == 0:
+                    pair = coinName + 'BTC'
+                    print coinName,
+                    info = self.binance.client.get_symbol_info(pair)
+                    if info:
+                        # print info
+                        ticker = self.binance.client.get_order_book(symbol=pair)
+                        if (ticker is not None and ticker['asks']):
+                            # print ticker['asks']
+                            price = float(ticker['asks'][0][0]) * 1.03
+                            BTC_total = USD_total / self.BTC_price * 1.03
+                            quantity = int(BTC_total / price)
+                            print price, quantity
+                            result = self.binance.client.order_market_buy(symbol=pair, quantity=quantity)
+
+    def sell_all_binance(self):
+        dontTouch = self.dontTouch
+        all_coins = self.binance.get_coin_balance()
+
+        for coinName, quantity in all_coins.items():
+            if coinName not in dontTouch:
+                pair = coinName + 'BTC'
+                price = float(self.binance.client.get_order_book(symbol=pair)['bids'][0][0])
+                BTC_value = price * quantity
+                extra_value = BTC_value - 0.01190112    # 200 USD
+                sell_quantity = int(extra_value / price)
+                if sell_quantity > 0:
+                    print coinName, sell_quantity
+                    result = self.binance.client.order_market_sell(symbol=pair, quantity=sell_quantity)
 
 
 
