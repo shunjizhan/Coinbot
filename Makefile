@@ -1,5 +1,5 @@
 all:
-	python gate/gateMain.py
+	python3 gate/gateMain.py
 	/usr/bin/env python2.7 main.py
 
 main:

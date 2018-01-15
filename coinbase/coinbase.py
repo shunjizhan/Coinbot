@@ -49,23 +49,34 @@ class Coinbase:
         total_USD = 0
         cash = 0
         for acc in account:
-            coin = acc['currency']
+            coinName = acc['currency']
             num = float(acc['balance'])
-            if (coin == 'USD'):
+            if (coinName == 'USD'):
                 cash = num * 1
                 total_USD += num * 1
             else:
-                total_USD += num * self.get_price(coin)
+                total_USD += num * self.get_price(coinName)
 
         return int(total_USD), int(cash)
 
     def get_coin_balance(self):
         account = requests.get(self.api_base_url + 'accounts', auth=self.auth).json()
+
+        BTC_price = self.get_BTC_price()
         coins = {}
         for acc in account:
-            name = acc['currency']
+            coinName = acc['currency']
             num = float(acc['balance'])
-            coins[name] = num
+            if coinName == 'USD':
+                BTC_value = num / BTC_price
+            else:
+                BTC_value = self.get_price(coinName) * num
+            USD_value = BTC_value * BTC_price
+            coins[coinName] = {
+                'num': num,
+                'BTC': BTC_value,
+                'USD': USD_value
+            }
         return coins
 
 

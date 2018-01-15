@@ -3,6 +3,16 @@ from bittrex.bittrex import Bittrex
 from coinbase.coinbase import Coinbase
 from binance.binance import Binance
 
+from collections import defaultdict
+
+
+def p(x):
+    for coinName, info in x.items():
+        info['BTC'] = round(info['BTC'], 2)
+        info['num'] = int(info['num'])
+        info['USD'] = int(info['USD'])
+    pp.pprint(x)
+
 
 def connect_success(exchange):
     print 'connected %s' % exchange
@@ -17,12 +27,14 @@ def getGateInfo():
         return int(float(f.read()))
 
 
+# combine two dicts with format {coinName: {'BTC': BTC_value, 'USD': USD_value, 'num': coin_num}}
 def combine(d1, d2):
-    for coin, num in d2.items():
+    for coin, info in d2.items():
         if coin in d1:
-            d1[coin] += num
+            for attribute in d1[coin]:
+                d1[coin][attribute] += info[attribute]
         else:
-            d1[coin] = num
+            d1[coin] = info
     return d1
 
 
@@ -48,8 +60,8 @@ class Coinbot:
         connect_success('bittrex')
 
         self.binance = Binance(
-            'siZx8vFmPgDkWXfv6KhvWB3QDTJo5NuV6NDu8FeALDBu6BhGbxLQSPNAfXTOmdso',
-            'yLfj5QyStnjrH0qUmRLlAF64BQIujsgADupH3B5nWmTIYhCXQddGzUhW6s2LVhBN'
+            'N0VUiMGmgZRXsEJyEEyXNITGZAELNfPIZyzzcTOSwV7q9MhZt6Mt7SFFdzERZgB5',
+            '7A6ZwSIwsfdWVnTSgK0Gc2JzAU2k5snEHf9DQuyM7VCNC4FykC14qxNxQmmyUhDU'
         )
         connect_success('binance')
 
@@ -59,7 +71,9 @@ class Coinbot:
     # ------------------------------------------ View --------------------------------------------- #
     # --------------------------------------------------------------------------------------------- #
     def get_USD_balance(self):
-        out = 3768 + 2000 + 8888 + 8338
+        ratio = defaultdict(int)
+
+        out = 2000 + 8888 + 8338
         print 'Out:     %d' % out
 
         USD_gate, cash_gate = getGateInfo(), 0
@@ -83,10 +97,10 @@ class Coinbot:
     def get_all_coins(self):
         coins = {}
         combine(coins, self.coinbase.get_coin_balance())
-        combine(coins, self.bittrex.get_coin_balance())
-        combine(coins, self.binance.get_coin_balance())
+        # combine(coins, self.bittrex.get_coin_balance())
+        # combine(coins, self.binance.get_coin_balance())
 
-        pp.pprint(coins)
+        p(coins)
 
     def get_bittrex_profit_ratio(self, base):
         coins = self.bittrex.get_coin_balance()
@@ -159,7 +173,7 @@ class Coinbot:
         # pp.pprint(balances)
         for coin in balances:
             coinName = coin['asset']
-            if coinName not in (dontTouch | {'BNC', 'ICO', '123', '456', 'BTM', 'PAY', 'ELC', 'LRX', 'FID'}):
+            if coinName not in dontTouch:
                 num = float(coin['free']) + float(coin['locked'])
                 if num == 0:
                     pair = coinName + 'BTC'
