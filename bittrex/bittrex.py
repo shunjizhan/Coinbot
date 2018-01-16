@@ -250,41 +250,6 @@ class Bittrex(object):
         """
         return self.api_query('getbalance', {'currency': currency})
 
-    def get_USD_balance(self, BTC_price):
-        all_coins = self.get_coin_balance()
-
-        BTC = 0
-        cash = 0
-        iteration = 0
-        coinCount = len(all_coins)
-        for coin in all_coins:
-            iteration += 1
-            if iteration == 300:
-                break
-            if iteration % 500 == 0:
-                print(str(iteration) + '/' + str(coinCount))
-
-            coinNum = float(all_coins[coin])
-            if coin == 'USDT':
-                cash += coinNum
-            elif coin == 'BTC':
-                BTC += coinNum
-            else:
-                ticker = self.get_ticker('BTC-' + coin)['result']
-                if (ticker is not None and ticker['Last'] is not None):
-                    BTC += float(ticker['Last']) * coinNum
-
-        return int(BTC * BTC_price + cash), int(cash)
-
-    def get_coin_balance(self):
-        balances = self.get_balances()
-        coins = {}
-        for coin in balances['result']:
-            coinName = coin['Currency']
-            num = coin['Balance']
-            coins[coinName] = num
-        return coins
-
     def get_deposit_address(self, currency):
         """
         Used to generate or retrieve an address for a specific currency
@@ -339,3 +304,45 @@ class Bittrex(object):
         :rtype : dict
         """
         return self.api_query('getorder', {'uuid': uuid})
+
+    # ---------------------------------------------------------------------- #
+    # ----------------------------- my functions --------------------------- #
+    # ---------------------------------------------------------------------- #
+    def get_BTC_price(self):
+        return float(self.get_ticker('USDT-BTC')['result']['Last'])
+
+    def get_price(self, coinName, base='BTC-'):
+        pair = base + coinName
+        ticker = self.get_ticker(pair)['result']
+        if (ticker is not None and ticker['Last'] is not None):
+            return float(ticker['Last'])
+        else:
+            return 0
+            # raise Exception('this pair (%s) does not exist in Bittrex!' % (pair))
+
+    def get_coin_balance(self):
+        balances = self.get_balances()
+        BTC_price = self.get_BTC_price()
+
+        coins = {'total': {'BTC': 0, 'USD': 0}}
+        for coin in balances['result']:
+            coinName = coin['Currency']
+            num = coin['Balance']
+            if coinName == 'USDT':
+                coinName = 'USD'
+                BTC_value = num / BTC_price
+            elif coinName == 'BTC':
+                BTC_value = num
+            else:
+                BTC_value = self.get_price(coinName) * num
+            USD_value = BTC_value * BTC_price
+
+            # update info
+            coins[coinName] = {
+                'num': num,
+                'BTC': BTC_value,
+                'USD': USD_value
+            }
+            coins['total']['BTC'] += BTC_value
+            coins['total']['USD'] += USD_value
+        return coins

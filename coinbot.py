@@ -3,23 +3,38 @@ from bittrex.bittrex import Bittrex
 from coinbase.coinbase import Coinbase
 from binance.binance import Binance
 
-from collections import defaultdict
+# from collections import defaultdict, OrderedDict
 
 
-def p(x):
-    for coinName, info in x.items():
+def show_coins(coins, full=False):
+    for coinName, info in coins.items():
         info['BTC'] = round(info['BTC'], 2)
-        info['num'] = int(info['num'])
         info['USD'] = int(info['USD'])
-    pp.pprint(x)
+        if coinName not in {'total', 'cang'}:
+            info['num'] = int(info['num'])
+
+    # print the result
+    if full:
+        print ' '
+        coinslist = sorted(coins.items(), key=lambda kv: kv[1]['USD'], reverse=True)
+        for coin, info in coinslist:
+            print coin, info
+    else:
+        print coins['total']['USD'],
+    print cang(coins)
 
 
 def connect_success(exchange):
     print 'connected %s' % exchange
 
 
-def cang(cash, total):
-    return str(100 - int(cash * 100 / total)) + '%'
+# def cang(cash, total):
+#     return str(100 - int(cash * 100 / total)) + '%'
+
+def cang(coins):
+    cash_ratio = round(coins['USD']['USD'] * 100.0 / coins['total']['USD'], 1)
+    coin_ratio = str(100 - cash_ratio)
+    return coin_ratio + '%'
 
 
 def getGateInfo():
@@ -71,8 +86,6 @@ class Coinbot:
     # ------------------------------------------ View --------------------------------------------- #
     # --------------------------------------------------------------------------------------------- #
     def get_USD_balance(self):
-        ratio = defaultdict(int)
-
         out = 2000 + 8888 + 8338
         print 'Out:     %d' % out
 
@@ -95,12 +108,25 @@ class Coinbot:
         print 'Total:   %s, %s, %.3f' % (USD_total, cang(cash_total, real_total), USD_total / 38800.0)
 
     def get_all_coins(self):
-        coins = {}
-        combine(coins, self.coinbase.get_coin_balance())
-        # combine(coins, self.bittrex.get_coin_balance())
-        # combine(coins, self.binance.get_coin_balance())
+        all_coins = {}
 
-        p(coins)
+        coinbase_coins = self.coinbase.get_coin_balance()
+        combine(all_coins, coinbase_coins)
+        print 'Coinbase: ',
+        show_coins(coinbase_coins)
+
+        bittrex_coins = self.bittrex.get_coin_balance()
+        combine(all_coins, bittrex_coins)
+        print 'Bittrex: ',
+        show_coins(bittrex_coins)
+
+        binance_coins = self.binance.get_coin_balance()
+        combine(all_coins, binance_coins)
+        print 'Binance: ',
+        show_coins(binance_coins)
+
+        print 'Total: ',
+        show_coins(all_coins, full=False)
 
     def get_bittrex_profit_ratio(self, base):
         coins = self.bittrex.get_coin_balance()

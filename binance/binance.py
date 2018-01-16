@@ -18,43 +18,42 @@ class Binance:
     def __init__(self, key, secret):
         self.client = Client(key, secret)
 
-    def get_USD_balance(self):
-        BTC = 0
-        cash = 0
-        all_coins = self.client.get_account()['balances']
-        for coin in all_coins:
-            num = float(coin['free']) + float(coin['locked'])
-            if num > 0:
-                coinName = coin['asset']
-                if coinName == 'BTC':
-                    BTC += num
-                elif coinName == 'USDT':
-                    cash = num
-                elif coinName not in {'SBTC', 'BCX', 'ETF'}:
-                    pair = coinName + 'BTC'
-                    price = float(self.client.get_order_book(symbol=pair)['bids'][0][0])
-                    BTC += price * num
+    def get_price(self, coinName):
+        pair = coinName + 'BTC'
+        if self.client.get_symbol_info(pair):
+            return float(self.client.get_order_book(symbol=pair)['bids'][0][0])
+        else:
+            return 0
 
-        BTC_price = float(self.client.get_order_book(symbol='BTCUSDT')['bids'][0][0])
-        return int(BTC * BTC_price + cash), int(cash)
+    def get_BTC_price(self):
+        return float(self.client.get_order_book(symbol='BTCUSDT')['bids'][0][0])
 
     def get_coin_balance(self):
-        all_coins = {}
         balances = self.client.get_account()['balances']
-        for coin in balances:
-            num = float(coin['free']) + float(coin['locked'])
-            if num > 0:
-                coinName = coin['asset']
-                all_coins[coinName] = num
-        return all_coins
+        BTC_price = self.get_BTC_price()
 
-    # def get_coin_full_balance(self, coin_balance):
-    #     BTC_price = float(self.client.get_order_book(symbol='BTCUSDT')['bids'][0][0])
-    #     res = {}
-    #     for coin, num in coin_balance.items():
-    #         price = float(self.client.get_order_book(symbol=pair)['bids'][0][0])
-    #         BTC_value = BTC_price * num
-    #         USD_value = BTC_value * BTC_price
+        coins = {'total': {'BTC': 0, 'USD': 0}}
+        for coin in balances:
+            coinName = coin['asset']
+            num = float(coin['free']) + float(coin['locked'])
+            if coinName == 'USDT':
+                coinName = 'USD'
+                BTC_value = num / BTC_price
+            elif coinName == 'BTC':
+                BTC_value = num
+            else:
+                BTC_value = self.get_price(coinName) * num
+            USD_value = BTC_value * BTC_price
+
+            # update info
+            coins[coinName] = {
+                'num': num,
+                'BTC': BTC_value,
+                'USD': USD_value
+            }
+            coins['total']['BTC'] += BTC_value
+            coins['total']['USD'] += USD_value
+        return coins
 
 
 # ------------------------------------------------------------ #
