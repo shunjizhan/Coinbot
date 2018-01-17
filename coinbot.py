@@ -20,7 +20,7 @@ def show_coins(coins, full=False):
         coinslist = sorted(coins.items(), key=lambda kv: kv[1]['USD'], reverse=True)
         for coin, info in coinslist:
             if info['USD'] > 0:
-                info['ratio'] = info['USD'] / total_USD
+                info['ratio'] = round(info['USD'] * 100.0 / total_USD, 1)
                 print coin, info
     else:
         print coins['total']['USD'],
@@ -85,6 +85,20 @@ class Coinbot:
     # --------------------------------------------------------------------------------------------- #
     # ------------------------------------------ View --------------------------------------------- #
     # --------------------------------------------------------------------------------------------- #
+    def get_all_profit_rate(self):
+        self.get_profit_rate('BTC', 'USDT')
+
+    def get_profit_rate(self, coin, base, _type=1):
+        # need more accurate calculation with bids and asks price
+        price_binance = self.binance.get_price(coin, base, _type)
+        price_bittrex = self.bittrex.get_price(coin, base, _type)
+        prices = {price_binance, price_bittrex}
+
+        big = max(prices)
+        small = min(prices)
+        diff = (big - small) / big
+        print '%s-%s %.2f%' % (coin, base, diff)
+
     def get_all_coins(self, full=False):
         all_coins = {}
 
@@ -111,7 +125,7 @@ class Coinbot:
         print 'Total:   ',
         show_coins(all_coins, full=full)
 
-    def get_bittrex_profit_ratio(self, base):
+    def get_bittrex_profit_ratio(self, base=200):
         coins = self.bittrex.get_coin_balance()
         for coin, count in coins.items():
             ticker = self.bittrex.get_ticker('BTC-' + coin)['result']

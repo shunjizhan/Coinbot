@@ -311,14 +311,14 @@ class Bittrex(object):
     def get_BTC_price(self):
         return float(self.get_ticker('USDT-BTC')['result']['Last'])
 
-    def get_price(self, coinName, base='BTC-'):
-        pair = base + coinName
+    def get_price(self, coin, base='BTC', _type=0):
+        TYPES = {0: 'Bid', 1: 'Ask', 2: 'Last'}
+        pair = '%s-%s' % (base, coin)
         ticker = self.get_ticker(pair)['result']
-        if (ticker is not None and ticker['Last'] is not None):
+        if (ticker is not None and ticker[TYPES[_type]] is not None):
             return float(ticker['Last'])
         else:
             return 0
-            # raise Exception('this pair (%s) does not exist in Bittrex!' % (pair))
 
     def get_coin_balance(self):
         balances = self.get_balances()

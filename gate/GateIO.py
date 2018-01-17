@@ -135,6 +135,12 @@ class GateIO:
     # ---------------------------------------------------------------------- #
     # ----------------------------- my functions --------------------------- #
     # ---------------------------------------------------------------------- #
+    def get_price(self, coin, base='BTC', _type=0):
+        TYPES = {0: 'bids', 1: 'asks', 2: 'last'}
+        pair = '%s_%s' % (coin, base)
+        ticker = self.ticker(pair)[TYPES[_type]]           
+        return float(ticker) if ticker else 0
+
     def get_coin_balance(self):
         balances = json.loads(self.balances())['available']
         ETH_price = float(self.ticker('eth_usdt')['last'])

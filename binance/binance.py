@@ -18,15 +18,16 @@ class Binance:
     def __init__(self, key, secret):
         self.client = Client(key, secret)
 
-    def get_price(self, coinName):
-        pair = coinName + 'BTC'
+    def get_price(self, coin, base='BTC', _type=0):
+        TYPES = {0: 'bids', 1: 'asks', 2: 'last'}
+        pair = coin + base
         if self.client.get_symbol_info(pair):
-            return float(self.client.get_order_book(symbol=pair)['bids'][0][0])
+            return float(self.client.get_order_book(symbol=pair)[TYPES[_type]][0][0])
         else:
             return 0
 
     def get_BTC_price(self):
-        return float(self.client.get_order_book(symbol='BTCUSDT')['bids'][0][0])
+        return self.get_price('BTC', base='USDT')
 
     def get_coin_balance(self):
         balances = self.client.get_account()['balances']
