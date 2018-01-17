@@ -4,3 +4,6 @@ all:
 
 main:
 	/usr/bin/env python2.7 main.py
+
+gat:
+	python3 gate/gateMain.py

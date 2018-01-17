@@ -1,9 +1,9 @@
 import pprint as pp
+import json
+
 from bittrex.bittrex import Bittrex
 from coinbase.coinbase import Coinbase
 from binance.binance import Binance
-
-# from collections import defaultdict, OrderedDict
 
 
 def show_coins(coins, full=False):
@@ -15,10 +15,13 @@ def show_coins(coins, full=False):
 
     # print the result
     if full:
+        total_USD = coins['total']['USD']
         print ' '
         coinslist = sorted(coins.items(), key=lambda kv: kv[1]['USD'], reverse=True)
         for coin, info in coinslist:
-            print coin, info
+            if info['USD'] > 0:
+                info['ratio'] = info['USD'] / total_USD
+                print coin, info
     else:
         print coins['total']['USD'],
     print cang(coins)
@@ -28,18 +31,15 @@ def connect_success(exchange):
     print 'connected %s' % exchange
 
 
-# def cang(cash, total):
-#     return str(100 - int(cash * 100 / total)) + '%'
-
 def cang(coins):
     cash_ratio = round(coins['USD']['USD'] * 100.0 / coins['total']['USD'], 1)
     coin_ratio = str(100 - cash_ratio)
     return coin_ratio + '%'
 
 
-def getGateInfo():
-    with open('gate/gate.txt') as f:
-        return int(float(f.read()))
+def get_gate_coins():
+    with open('gate/gate.json') as gate:
+        return json.load(gate)
 
 
 # combine two dicts with format {coinName: {'BTC': BTC_value, 'USD': USD_value, 'num': coin_num}}
@@ -85,34 +85,17 @@ class Coinbot:
     # --------------------------------------------------------------------------------------------- #
     # ------------------------------------------ View --------------------------------------------- #
     # --------------------------------------------------------------------------------------------- #
-    def get_USD_balance(self):
-        out = 2000 + 8888 + 8338
-        print 'Out:     %d' % out
-
-        USD_gate, cash_gate = getGateInfo(), 0
-        print 'gate.io: %s, %s' % (USD_gate, cang(cash_gate, USD_gate))
-
-        USD_gdax, cash_gdax = self.coinbase.get_USD_balance()
-        # USD_gdax, cash_gdax = 60419, 60419
-        print 'GDAX:    %s, %s' % (USD_gdax, cang(cash_gdax, USD_gdax))
-
-        USD_bittrex, cash_bittrex = self.bittrex.get_USD_balance(self.BTC_price)
-        print 'Bittrex: %s, %s' % (USD_bittrex, cang(cash_bittrex, USD_bittrex))
-
-        USD_binance, cash_binance = self.binance.get_USD_balance()
-        print 'Binance: %s, %s' % (USD_binance, cang(cash_binance, USD_binance))
-
-        real_total = USD_bittrex + USD_gdax + USD_binance + USD_gate
-        USD_total = int(real_total + out)
-        cash_total = cash_gdax + cash_bittrex + cash_gate + cash_binance
-        print 'Total:   %s, %s, %.3f' % (USD_total, cang(cash_total, real_total), USD_total / 38800.0)
-
-    def get_all_coins(self):
+    def get_all_coins(self, full=False):
         all_coins = {}
+
+        gate_coins = get_gate_coins()
+        combine(all_coins, gate_coins)
+        print 'GateIO:  ',
+        show_coins(gate_coins)
 
         coinbase_coins = self.coinbase.get_coin_balance()
         combine(all_coins, coinbase_coins)
-        print 'Coinbase: ',
+        print 'Coinbase:',
         show_coins(coinbase_coins)
 
         bittrex_coins = self.bittrex.get_coin_balance()
@@ -125,8 +108,8 @@ class Coinbot:
         print 'Binance: ',
         show_coins(binance_coins)
 
-        print 'Total: ',
-        show_coins(all_coins, full=False)
+        print 'Total:   ',
+        show_coins(all_coins, full=full)
 
     def get_bittrex_profit_ratio(self, base):
         coins = self.bittrex.get_coin_balance()

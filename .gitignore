@@ -2,7 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
-gate/gate.txt
+gate/gate.json
 .DS_Store
 
 # C extensions

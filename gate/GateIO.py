@@ -11,22 +11,6 @@ class GateIO:
         self.__apikey = apikey
         self.__secretkey = secretkey
 
-    def get_USD_balance(self):
-        # print (self.balances())
-        ETH_price = float(self.ticker('eth_usdt')['last'])
-        balances = json.loads(self.balances())['available']
-        total = 0
-        for coin in balances:
-            if coin not in {'ETH', 'USDT'}:
-                num = float(balances[coin])
-                if coin == 'FIL':
-                    price = float(self.ticker('FIL_usdt')['last'])
-                else:
-                    pair = '%s_eth' % coin
-                    price = float(self.ticker(pair)['last']) * ETH_price
-                total += price * num
-        return total
-
     #所有交易对
     def pairs(self):
         URL = "/api2/1/pairs"
@@ -147,3 +131,37 @@ class GateIO:
         URL = "/api2/1/private/withdraw"
         params = {'currency': currency, 'amount': amount,'address':address}
         return httpPost(self.__url, URL, params, self.__apikey, self.__secretkey)
+
+    # ---------------------------------------------------------------------- #
+    # ----------------------------- my functions --------------------------- #
+    # ---------------------------------------------------------------------- #
+    def get_coin_balance(self):
+        balances = json.loads(self.balances())['available']
+        ETH_price = float(self.ticker('eth_usdt')['last'])
+        BTC_price = float(self.ticker('btc_usdt')['last'])
+
+        coins = {'total': {'BTC': 0, 'USD': 0}}
+        for coinName in balances:
+            num = float(balances[coinName])
+            if coinName == 'USDT':
+                coinName = 'USD'
+                USD_value = num
+            elif coinName == 'BTC':
+                USD_value = num / BTC_price
+            elif coinName in {'FIL', 'ETH'}:
+                USD_value = num * float(self.ticker('FIL_usdt')['last'])
+            else:
+                pair = '%s_eth' % coinName
+                price_in_USD = float(self.ticker(pair)['last']) * ETH_price
+                USD_value = price_in_USD * num
+            BTC_value = USD_value / BTC_price
+
+            # update info
+            coins[coinName] = {
+                'num': num,
+                'BTC': BTC_value,
+                'USD': USD_value
+            }
+            coins['total']['BTC'] += BTC_value
+            coins['total']['USD'] += USD_value
+        return coins
