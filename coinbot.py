@@ -53,6 +53,20 @@ def combine(d1, d2):
     return d1
 
 
+'''
+combine two markets with format {
+    'BTC': {'ETH', 'EOS'},
+    'ETH': {'NEO', 'EOS'}},
+    ...
+}
+'''
+def combine_markets(m1, m2):
+    assert(m1.keys() == m2.keys())
+    for base in m1.keys():
+        m1[base] |= m2[base]
+    return m1
+
+
 class Coinbot:
     def __init__(self):
         self.connect_exchanges()
@@ -86,18 +100,43 @@ class Coinbot:
     # ------------------------------------------ View --------------------------------------------- #
     # --------------------------------------------------------------------------------------------- #
     def get_all_profit_rate(self):
-        self.get_profit_rate('BTC', 'USDT')
+        bases = {'BTC', 'ETH', 'USDT'}
+        all_markets = {}
+        cur_markets = {}
+        for base in bases:
+            cur_markets[base] = set()
+            bittrex_markets = self.bittrex.get_markets()['result']
+            for info in bittrex_markets:
+                if info['BaseCurrency'] == base:
+                    cur_markets[base].add(info['MarketCurrency'])
+            all_markets[base] = cur_markets[base]
+
+            cur_markets[base] = set()
+            binance_markets = self.binance.client.get_products()['data']
+            for info in binance_markets:
+                if info['quoteAsset'] == base:
+                    cur_markets[base].add(info['baseAsset'])
+            all_markets[base] &= cur_markets[base]
+
+        # pp.pprint(all_markets)
+
+        while True:
+            for base, markets in all_markets.items():
+                for coin in markets:
+                    self.get_profit_rate(coin, base)
 
     def get_profit_rate(self, coin, base, _type=1):
         # need more accurate calculation with bids and asks price
         price_binance = self.binance.get_price(coin, base, _type)
         price_bittrex = self.bittrex.get_price(coin, base, _type)
         prices = {price_binance, price_bittrex}
+        if 0 in prices:
+            return 0
 
-        big = max(prices)
-        small = min(prices)
-        diff = (big - small) / big
-        print '%s-%s %.2f%' % (coin, base, diff)
+        big, small = max(prices), min(prices)
+        diff = (big - small) / big if big > 0 else 0
+        if diff > 0.01:
+            print '%s-%s %.2f' % (coin, base, diff * 100) + '%'
 
     def get_all_coins(self, full=False):
         all_coins = {}
