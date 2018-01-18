@@ -123,20 +123,24 @@ class Coinbot:
         while True:
             for base, markets in all_markets.items():
                 for coin in markets:
-                    self.get_profit_rate(coin, base)
+                    self.get_diff_rate(coin, base)
 
-    def get_profit_rate(self, coin, base, _type=1):
+    def get_diff_rate(self, coin, base, _type=1):
         # need more accurate calculation with bids and asks price
-        price_binance = self.binance.get_price(coin, base, _type)
-        price_bittrex = self.bittrex.get_price(coin, base, _type)
-        prices = {price_binance, price_bittrex}
+        exchange_price = {}
+        exchange_price['binance'] = self.binance.get_price(coin, base, _type)
+        exchange_price['bittrex'] = self.bittrex.get_price(coin, base, _type)
+        price_exchange = {v: k for k, v in exchange_price.items()}
+
+        prices = exchange_price.values()
         if 0 in prices:
             return 0
 
-        big, small = max(prices), min(prices)
-        diff = (big - small) / big if big > 0 else 0
+        high, low = max(prices), min(prices)
+        diff = (high - low) / high if high > 0 else 0
         if diff > 0.01:
-            print '%s-%s %.2f' % (coin, base, diff * 100) + '%'
+            # print price_exchange, high, low
+            print '%s-%s %.1f' % (coin, base, diff * 100) + '%  ' + '%s > %s' % (price_exchange[high], price_exchange[low])
 
     def get_all_coins(self, full=False):
         all_coins = {}
