@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import requests
 import hmac
 import hashlib
@@ -13,8 +16,9 @@ class CoinbaseAuth(AuthBase):
 
     def __call__(self, request):
         timestamp = str(requests.get('https://api.gdax.com/time').json()['epoch'])
-        message = timestamp + request.method + request.path_url + (request.body or '')
-        hmac_key = base64.b64decode(self.secret_key)
+        message = (timestamp + request.method + request.path_url + (request.body or '')).encode('utf-8')
+        hmac_key = (base64.b64decode(self.secret_key))
+        print (type(message), type(hmac_key))
         signature = hmac.new(hmac_key, message, hashlib.sha256)
         signature_b64 = signature.digest().encode('base64').rstrip('\n')
 

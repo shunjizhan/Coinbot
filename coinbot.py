@@ -4,7 +4,7 @@ import json
 from bittrex.bittrex import Bittrex
 from coinbase.coinbase import Coinbase
 from binance.binance import Binance
-
+from gate.gate import Gate
 
 def show_coins(coins, full=False):
     for coinName, info in coins.items():
@@ -16,19 +16,19 @@ def show_coins(coins, full=False):
     # print the result
     if full:
         total_USD = coins['total']['USD']
-        print ' '
+        print(' ')
         coinslist = sorted(coins.items(), key=lambda kv: kv[1]['USD'], reverse=True)
         for coin, info in coinslist:
             if info['USD'] > 0:
                 info['ratio'] = round(info['USD'] * 100.0 / total_USD, 1)
-                print coin, info
+                print(coin, info)
     else:
-        print coins['total']['USD'],
-    print cang(coins)
+        print(coins['total']['USD']),
+    print(cang(coins))
 
 
 def connect_success(exchange):
-    print 'connected %s' % exchange
+    print('connected %s' % exchange)
 
 
 def cang(coins):
@@ -65,8 +65,14 @@ class Coinbot:
         key_coinbase = keys['coinbase']
         key_bittrex = keys['bittrex']
         key_binance = keys['binance']
+        key_gate = keys['gate']
 
-        print ' '
+        print(' ')
+        self.gate = Gate(
+            key_gate['key'],
+            key_gate['secret']
+        )
+        print(' ')
         self.coinbase = Coinbase(
             key_coinbase['key'],
             key_coinbase['secret'],
@@ -86,7 +92,7 @@ class Coinbot:
         )
         connect_success('binance')
 
-        print ' '
+        print(' ')
 
     # --------------------------------------------------------------------------------------------- #
     # ------------------------------------------ View --------------------------------------------- #
@@ -132,32 +138,32 @@ class Coinbot:
         diff = (high - low) / high if high > 0 else 0
         if diff > 0.01:
             # print price_exchange, high, low
-            print '%s-%s %.1f' % (coin, base, diff * 100) + '%  ' + '%s > %s' % (price_exchange[high], price_exchange[low])
+            print('%s-%s %.1f' % (coin, base, diff * 100) + '%  ' + '%s > %s' % (price_exchange[high], price_exchange[low]))
 
     def get_all_coins(self, full=False):
         all_coins = {}
 
-        gate_coins = get_gate_coins()
+        gate_coins = self.gate.get_coin_balance()
         combine(all_coins, gate_coins)
-        print 'GateIO:  ',
+        print('GateIO:  '),
         show_coins(gate_coins)
 
         coinbase_coins = self.coinbase.get_coin_balance()
         combine(all_coins, coinbase_coins)
-        print 'Coinbase:',
+        print('Coinbase:'),
         show_coins(coinbase_coins)
 
         bittrex_coins = self.bittrex.get_coin_balance()
         combine(all_coins, bittrex_coins)
-        print 'Bittrex: ',
+        print('Bittrex: '),
         show_coins(bittrex_coins)
 
         binance_coins = self.binance.get_coin_balance()
         combine(all_coins, binance_coins)
-        print 'Binance: ',
+        print('Binance: '),
         show_coins(binance_coins)
 
-        print 'Total:   ',
+        print('Total:   '),
         show_coins(all_coins, full=full)
 
     def get_bittrex_profit_ratio(self, base=200):
@@ -169,8 +175,8 @@ class Coinbot:
                 percent = count * float(ticker['Last']) * self.BTC_price / base
                 percent_sum += percent
                 coin_count += 1
-                print coin, '%.2f' % percent
-        print percent_sum / coin_count
+                print(coin, '%.2f' % percent)
+        print(percent_sum / coin_count)
 
     # --------------------------------------------------------------------------------------------- #
     # ----------------------------------------- Trade --------------------------------------------- #
@@ -193,7 +199,7 @@ class Coinbot:
                         details = self.bittrex.get_order(result['result']['uuid'])
                         USD = float(details['result']['Price']) * self.BTC_price
 
-                        print name, int(USD),
+                        print(name, int(USD)),
                         # break
 
     def sell_all_bittrex(self):
@@ -219,10 +225,10 @@ class Coinbot:
                         count += 1
                         total += USD
 
-                        print name, int(USD),
-                        print '%.2f' % percent
+                        print(name, int(USD)),
+                        print('%.2f' % percent)
                         # break
-        print total, total / count
+        print(total, total / count)
 
     def buy_all_binance(self, USD_total=200.0):
         dontTouch = self.dontTouch
@@ -235,7 +241,7 @@ class Coinbot:
                 num = float(coin['free']) + float(coin['locked'])
                 if num == 0:
                     pair = coinName + 'BTC'
-                    print coinName,
+                    print(coinName),
                     info = self.binance.client.get_symbol_info(pair)
                     if info:
                         # print info
@@ -245,7 +251,7 @@ class Coinbot:
                             price = float(ticker['asks'][0][0]) * 1.03
                             BTC_total = USD_total / self.BTC_price * 1.03
                             quantity = int(BTC_total / price)
-                            print price, quantity
+                            print(price, quantity)
                             result = self.binance.client.order_market_buy(symbol=pair, quantity=quantity)
 
     def sell_all_binance(self):
@@ -260,7 +266,7 @@ class Coinbot:
                 extra_value = BTC_value - 0.01190112    # 200 USD
                 sell_quantity = int(extra_value / price)
                 if sell_quantity > 0:
-                    print coinName, sell_quantity
+                    print(coinName, sell_quantity)
                     result = self.binance.client.order_market_sell(symbol=pair, quantity=sell_quantity)
 
 

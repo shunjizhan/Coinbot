@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import json
-from HttpUtil import httpGet, httpPost
+from .HttpUtil import httpGet, httpPost
 
 
-class GateIO:
+class Gate:
     def __init__(self, apikey, secretkey):
         self.__url = 'data.gate.io'
         self.__apikey = apikey

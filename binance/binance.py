@@ -6,7 +6,7 @@ import hmac
 import requests
 import six
 import time
-from BinanceExceptions import BinanceAPIException, BinanceRequestException, BinanceWithdrawException
+from .BinanceExceptions import BinanceAPIException, BinanceRequestException, BinanceWithdrawException
 
 if six.PY2:
     from urllib import urlencode
