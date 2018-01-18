@@ -16,11 +16,10 @@ class CoinbaseAuth(AuthBase):
 
     def __call__(self, request):
         timestamp = str(requests.get('https://api.gdax.com/time').json()['epoch'])
-        message = (timestamp + request.method + request.path_url + (request.body or '')).encode('utf-8')
+        message = (timestamp + request.method + request.path_url + (request.body or '')).encode('ascii')
         hmac_key = (base64.b64decode(self.secret_key))
-        print (type(message), type(hmac_key))
         signature = hmac.new(hmac_key, message, hashlib.sha256)
-        signature_b64 = signature.digest().encode('base64').rstrip('\n')
+        signature_b64 = base64.b64encode(signature.digest()).decode('utf-8').rstrip('\n')
 
         request.headers.update({
             'CB-ACCESS-SIGN': signature_b64,

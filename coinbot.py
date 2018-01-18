@@ -1,10 +1,18 @@
 import pprint as pp
 import json
+import sys
 
 from bittrex.bittrex import Bittrex
 from coinbase.coinbase import Coinbase
 from binance.binance import Binance
 from gate.gate import Gate
+
+
+def p(x):
+    if type(x) is not str:
+        x = str(x)
+    sys.stdout.write(x + ' ')
+
 
 def show_coins(coins, full=False):
     for coinName, info in coins.items():
@@ -16,14 +24,13 @@ def show_coins(coins, full=False):
     # print the result
     if full:
         total_USD = coins['total']['USD']
-        print(' ')
         coinslist = sorted(coins.items(), key=lambda kv: kv[1]['USD'], reverse=True)
         for coin, info in coinslist:
             if info['USD'] > 0:
                 info['ratio'] = round(info['USD'] * 100.0 / total_USD, 1)
-                print(coin, info)
+                p(coin, info)
     else:
-        print(coins['total']['USD']),
+        p(coins['total']['USD'])
     print(cang(coins))
 
 
@@ -35,11 +42,6 @@ def cang(coins):
     cash_ratio = round(coins['USD']['USD'] * 100.0 / coins['total']['USD'], 1)
     coin_ratio = str(100 - cash_ratio)
     return coin_ratio + '%'
-
-
-def get_gate_coins():
-    with open('gate/gate.json') as gate:
-        return json.load(gate)
 
 
 # combine two dicts with format {coinName: {'BTC': BTC_value, 'USD': USD_value, 'num': coin_num}}
@@ -67,12 +69,14 @@ class Coinbot:
         key_binance = keys['binance']
         key_gate = keys['gate']
 
-        print(' ')
+        print('')
+
         self.gate = Gate(
             key_gate['key'],
             key_gate['secret']
         )
-        print(' ')
+        connect_success('gate')
+
         self.coinbase = Coinbase(
             key_coinbase['key'],
             key_coinbase['secret'],
@@ -91,8 +95,6 @@ class Coinbot:
             key_binance['secret']
         )
         connect_success('binance')
-
-        print(' ')
 
     # --------------------------------------------------------------------------------------------- #
     # ------------------------------------------ View --------------------------------------------- #
@@ -145,25 +147,25 @@ class Coinbot:
 
         gate_coins = self.gate.get_coin_balance()
         combine(all_coins, gate_coins)
-        print('GateIO:  '),
+        p('GateIO:  '),
         show_coins(gate_coins)
 
         coinbase_coins = self.coinbase.get_coin_balance()
         combine(all_coins, coinbase_coins)
-        print('Coinbase:'),
+        p('Coinbase:'),
         show_coins(coinbase_coins)
 
         bittrex_coins = self.bittrex.get_coin_balance()
         combine(all_coins, bittrex_coins)
-        print('Bittrex: '),
+        p('Bittrex: '),
         show_coins(bittrex_coins)
 
         binance_coins = self.binance.get_coin_balance()
         combine(all_coins, binance_coins)
-        print('Binance: '),
+        p('Binance: '),
         show_coins(binance_coins)
 
-        print('Total:   '),
+        p('Total:   '),
         show_coins(all_coins, full=full)
 
     def get_bittrex_profit_ratio(self, base=200):
