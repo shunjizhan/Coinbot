@@ -53,20 +53,6 @@ def combine(d1, d2):
     return d1
 
 
-'''
-combine two markets with format {
-    'BTC': {'ETH', 'EOS'},
-    'ETH': {'NEO', 'EOS'}},
-    ...
-}
-'''
-def combine_markets(m1, m2):
-    assert(m1.keys() == m2.keys())
-    for base in m1.keys():
-        m1[base] |= m2[base]
-    return m1
-
-
 class Coinbot:
     def __init__(self):
         self.connect_exchanges()
@@ -74,23 +60,29 @@ class Coinbot:
         self.dontTouch = {'XRP', 'XEM', 'BTC', 'DOGE', 'SC', 'NEO', 'ZEC', 'BTG', 'MONA', 'WINGS', 'USDT', 'IOTA', 'EOS', 'QTUM', 'ADA', 'XLM', 'LSK', 'BTS', 'XMR', 'DASH', 'SNT', 'BCC', 'BCH', 'SBTC', 'BCX', 'ETF', 'LTC', 'ETH'}
 
     def connect_exchanges(self):
+        with open('./keys.json') as key_file:
+            keys = json.load(key_file)
+        key_coinbase = keys['coinbase']
+        key_bittrex = keys['bittrex']
+        key_binance = keys['binance']
+
         print ' '
         self.coinbase = Coinbase(
-            'ad8327c971400a583a511c8b44153c3b',
-            '4oc5G42pHNRGf6fxBhL+JE3bwKH54SothrVzCVwgBD7dxdj/PLWz2rrBYx3f9V3/lh3Cj2vLzMfsXIvmv5W1mg==',
-            '5rngcof6sug'
+            key_coinbase['key'],
+            key_coinbase['secret'],
+            key_coinbase['pass']
         )
         connect_success('coinbase')
 
         self.bittrex = Bittrex(
-            "f4a53cc750174691bb8a26adf5b9d732",
-            "74cdede4f6a34ae88e782b339fdf2830"
+            key_bittrex['key'],
+            key_bittrex['secret']
         )
         connect_success('bittrex')
 
         self.binance = Binance(
-            'N0VUiMGmgZRXsEJyEEyXNITGZAELNfPIZyzzcTOSwV7q9MhZt6Mt7SFFdzERZgB5',
-            '7A6ZwSIwsfdWVnTSgK0Gc2JzAU2k5snEHf9DQuyM7VCNC4FykC14qxNxQmmyUhDU'
+            key_binance['key'],
+            key_binance['secret']
         )
         connect_success('binance')
 
