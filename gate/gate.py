@@ -136,7 +136,7 @@ class Gate:
     # ----------------------------- my functions --------------------------- #
     # ---------------------------------------------------------------------- #
     def get_price(self, coin, base='BTC', _type=0):
-        TYPES = {0: 'bids', 1: 'asks', 2: 'last'}
+        TYPES = {0: 'highestBid', 1: 'lowestAsk', 2: 'last'}
         pair = '%s_%s' % (coin, base)
         ticker = self.ticker(pair)[TYPES[_type]]           
         return float(ticker) if ticker else 0

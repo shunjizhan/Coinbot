@@ -8,13 +8,15 @@ from binance.binance import Binance
 from gate.gate import Gate
 
 
-def p(x):
-    if type(x) is not str:
-        x = str(x)
-    sys.stdout.write(x + ' ')
+def p(*args):
+    for x in args:
+        if type(x) is not str:
+            x = str(x)
+        sys.stdout.write(x + ' ')
 
 
 def show_coins(coins, full=False):
+    # pp.pprint (coins)
     for coinName, info in coins.items():
         info['BTC'] = round(info['BTC'], 2)
         info['USD'] = int(info['USD'])
@@ -28,7 +30,7 @@ def show_coins(coins, full=False):
         for coin, info in coinslist:
             if info['USD'] > 0:
                 info['ratio'] = round(info['USD'] * 100.0 / total_USD, 1)
-                p(coin, info)
+                print(coin, info)
     else:
         p(coins['total']['USD'])
     print(cang(coins))
@@ -96,10 +98,12 @@ class Coinbot:
         )
         connect_success('binance')
 
+        print('')
+
     # --------------------------------------------------------------------------------------------- #
     # ------------------------------------------ View --------------------------------------------- #
     # --------------------------------------------------------------------------------------------- #
-    def get_all_profit_rate(self):
+    def get_all_diff_rate(self):
         bases = {'BTC', 'ETH', 'USDT'}
         all_markets = {}
         cur_markets = {}
@@ -118,18 +122,26 @@ class Coinbot:
                     cur_markets[base].add(info['baseAsset'])
             all_markets[base] &= cur_markets[base]
 
-        # pp.pprint(all_markets)
+            cur_markets[base] = set()
+            gate_markets = self.gate.pairs()
+            for pair in gate_markets:
+                coin, gate_base = pair.split('_')
+                if gate_base.upper() == base:
+                    cur_markets[base].add(coin.upper())
+            all_markets[base] &= cur_markets[base]
 
+        pp.pprint(all_markets)
         while True:
             for base, markets in all_markets.items():
                 for coin in markets:
                     self.get_diff_rate(coin, base)
 
-    def get_diff_rate(self, coin, base, _type=1):
+    def get_diff_rate(self, coin, base, _type=0):
         # need more accurate calculation with bids and asks price
         exchange_price = {}
         exchange_price['binance'] = self.binance.get_price(coin, base, _type)
         exchange_price['bittrex'] = self.bittrex.get_price(coin, base, _type)
+        exchange_price['gate'] = self.gate.get_price(coin, base, _type)
         price_exchange = {v: k for k, v in exchange_price.items()}
 
         prices = exchange_price.values()
@@ -144,7 +156,6 @@ class Coinbot:
 
     def get_all_coins(self, full=False):
         all_coins = {}
-
         gate_coins = self.gate.get_coin_balance()
         combine(all_coins, gate_coins)
         p('GateIO:  '),
