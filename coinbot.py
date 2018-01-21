@@ -1,55 +1,12 @@
 import pprint as pp
 import json
-import sys
 
+from utils import p, show_coins, combine_coins
 from exchange.bittrex.bittrex import Bittrex
 from exchange.coinbase.coinbase import Coinbase
 from exchange.binance.binance import Binance
 from exchange.gate.gate import Gate
 from exchange.dew.dew import Dew
-
-
-def p(*args):
-    for x in args:
-        if type(x) is not str:
-            x = str(x)
-        sys.stdout.write(x + ' ')
-
-
-def show_coins(coins, full=False, USD_out=0):
-    # pp.pprint (coins)
-    for coinName, info in coins.items():
-        info['BTC'] = round(info['BTC'], 2)
-        info['USD'] = int(info['USD'])
-        if coinName not in {'total', 'cang'}:
-            info['num'] = int(info['num'])
-
-    # print the result
-    if full:
-        total_USD = coins['total']['USD']
-        coinslist = sorted(coins.items(), key=lambda kv: kv[1]['USD'], reverse=True)
-        for coin, info in coinslist:
-            if info['USD'] > 0:
-                info['ratio'] = round(info['USD'] * 100.0 / total_USD, 1)
-                print(coin, info)
-    else:
-        p(coins['total']['USD'])
-
-    # 算仓位
-    cash_ratio = round(coins['USD']['USD'] * 100.0 / (coins['total']['USD'] - USD_out), 1)
-    coin_ratio = str(100 - cash_ratio)
-    print(coin_ratio + '%')
-
-
-# combine two dicts with format {coinName: {'BTC': BTC_value, 'USD': USD_value, 'num': coin_num}}
-def combine(d1, d2):
-    for coin, info in d2.items():
-        if coin in d1:
-            for attribute in d1[coin]:
-                d1[coin][attribute] += info[attribute]
-        else:
-            d1[coin] = info
-    return d1
 
 
 class Coinbot:
@@ -170,7 +127,7 @@ class Coinbot:
 
         for ex_name, exchange in self.all_exchanges.items():
             coins = exchange.get_coin_balance()
-            combine(all_coins, coins)
+            combine_coins(all_coins, coins)
             p(ex_name + ': '),
             show_coins(coins)
 
