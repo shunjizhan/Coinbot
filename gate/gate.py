@@ -138,7 +138,7 @@ class Gate:
     def get_price(self, coin, base='BTC', _type=0):
         TYPES = {0: 'highestBid', 1: 'lowestAsk', 2: 'last'}
         pair = '%s_%s' % (coin, base)
-        ticker = self.ticker(pair)[TYPES[_type]]           
+        ticker = self.ticker(pair)[TYPES[_type]]
         return float(ticker) if ticker else 0
 
     def get_coin_balance(self):
@@ -146,7 +146,7 @@ class Gate:
         ETH_price = float(self.ticker('eth_usdt')['last'])
         BTC_price = float(self.ticker('btc_usdt')['last'])
 
-        coins = {'total': {'BTC': 0, 'USD': 0}}
+        coins = {'total': {'BTC': 0, 'USD': 0, 'num': 0}}
         for coinName in balances:
             num = float(balances[coinName])
             if coinName == 'USDT':

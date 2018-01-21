@@ -6,6 +6,7 @@ from bittrex.bittrex import Bittrex
 from coinbase.coinbase import Coinbase
 from binance.binance import Binance
 from gate.gate import Gate
+from dew.dew import Dew
 
 
 def p(*args):
@@ -15,7 +16,7 @@ def p(*args):
         sys.stdout.write(x + ' ')
 
 
-def show_coins(coins, full=False):
+def show_coins(coins, full=False, USD_out=0):
     # pp.pprint (coins)
     for coinName, info in coins.items():
         info['BTC'] = round(info['BTC'], 2)
@@ -33,17 +34,11 @@ def show_coins(coins, full=False):
                 print(coin, info)
     else:
         p(coins['total']['USD'])
-    print(cang(coins))
 
-
-def connect_success(exchange):
-    print('connected %s' % exchange)
-
-
-def cang(coins):
-    cash_ratio = round(coins['USD']['USD'] * 100.0 / coins['total']['USD'], 1)
+    # 算仓位
+    cash_ratio = round(coins['USD']['USD'] * 100.0 / (coins['total']['USD'] - USD_out), 1)
     coin_ratio = str(100 - cash_ratio)
-    return coin_ratio + '%'
+    print(coin_ratio + '%')
 
 
 # combine two dicts with format {coinName: {'BTC': BTC_value, 'USD': USD_value, 'num': coin_num}}
@@ -57,9 +52,14 @@ def combine(d1, d2):
     return d1
 
 
+def connect_success(exchange):
+    print('connected %s' % exchange)
+
+
 class Coinbot:
     def __init__(self):
         self.connect_exchanges()
+        # BTC_price might need to keep updating if the program keep running
         self.BTC_price = self.coinbase.get_BTC_price()
         self.dontTouch = {'XRP', 'XEM', 'BTC', 'DOGE', 'SC', 'NEO', 'ZEC', 'BTG', 'MONA', 'WINGS', 'USDT', 'IOTA', 'EOS', 'QTUM', 'ADA', 'XLM', 'LSK', 'BTS', 'XMR', 'DASH', 'SNT', 'BCC', 'BCH', 'SBTC', 'BCX', 'ETF', 'LTC', 'ETH'}
 
@@ -98,12 +98,15 @@ class Coinbot:
         )
         connect_success('binance')
 
+        self.dew = Dew()
+        connect_success('dew')
+
         print('')
 
     # --------------------------------------------------------------------------------------------- #
     # ------------------------------------------ View --------------------------------------------- #
     # --------------------------------------------------------------------------------------------- #
-    def get_all_diff_rate(self):
+    def get_all_diff_rate(self, min_diff=0.03):
         bases = {'BTC', 'ETH', 'USDT'}
         all_markets = {}
         cur_markets = {}
@@ -132,12 +135,12 @@ class Coinbot:
 
         pp.pprint(all_markets)
         while True:
+            print('----------------------------------------')
             for base, markets in all_markets.items():
                 for coin in markets:
-                    self.get_diff_rate(coin, base)
+                    self.get_diff_rate(coin, base, min_diff)
 
-    def get_diff_rate(self, coin, base, _type=0):
-        # need more accurate calculation with bids and asks price
+    def get_diff_rate(self, coin, base, min_diff, _type=0):
         exchange_price = {}
         exchange_price['binance'] = self.binance.get_price(coin, base, _type)
         exchange_price['bittrex'] = self.bittrex.get_price(coin, base, _type)
@@ -150,34 +153,40 @@ class Coinbot:
 
         high, low = max(prices), min(prices)
         diff = (high - low) / high if high > 0 else 0
-        if diff > 0.01:
-            # print price_exchange, high, low
+        if diff >= min_diff:
+            # need more accurate diff calculation with bids and asks price
             print('%s-%s %.1f' % (coin, base, diff * 100) + '%  ' + '%s > %s' % (price_exchange[high], price_exchange[low]))
+        # else:
+        #     print('%s-%s X' % (coin, base))
 
     def get_all_coins(self, full=False):
-        all_coins = {}
-        gate_coins = self.gate.get_coin_balance()
-        combine(all_coins, gate_coins)
-        p('GateIO:  '),
-        show_coins(gate_coins)
+        USD_out = 2000 + 8888 + 8338
+        all_coins = {
+            'total': {
+                'BTC': USD_out / self.BTC_price,
+                'USD': USD_out,
+                'num': 0
+            }
+        }
 
-        coinbase_coins = self.coinbase.get_coin_balance()
-        combine(all_coins, coinbase_coins)
-        p('Coinbase:'),
-        show_coins(coinbase_coins)
+        all_exchanges = {
+            'gate': self.gate,
+            'dew': self.dew,
+            'coinbase': self.coinbase,
+            'binance': self.binance,
+            'bittrex': self.bittrex,
+        }
 
-        bittrex_coins = self.bittrex.get_coin_balance()
-        combine(all_coins, bittrex_coins)
-        p('Bittrex: '),
-        show_coins(bittrex_coins)
+        for ex_name, exchange in all_exchanges.items():
+            coins = exchange.get_coin_balance()
+            combine(all_coins, coins)
+            p(ex_name + ': '),
+            show_coins(coins)
 
-        binance_coins = self.binance.get_coin_balance()
-        combine(all_coins, binance_coins)
-        p('Binance: '),
-        show_coins(binance_coins)
+        p('Out:     ' + str(USD_out) + ' 100%'),
 
         p('Total:   '),
-        show_coins(all_coins, full=full)
+        show_coins(all_coins, full=full, USD_out=USD_out)
 
     def get_bittrex_profit_ratio(self, base=200):
         coins = self.bittrex.get_coin_balance()

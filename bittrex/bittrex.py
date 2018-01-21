@@ -324,7 +324,7 @@ class Bittrex(object):
         balances = self.get_balances()
         BTC_price = self.get_BTC_price()
 
-        coins = {'total': {'BTC': 0, 'USD': 0}}
+        coins = {'total': {'BTC': 0, 'USD': 0, 'num': 0}}
         for coin in balances['result']:
             coinName = coin['Currency']
             num = coin['Balance']
