@@ -1,9 +1,12 @@
 import requests
 
+from ..exchange import Exchange
 
-class Dew:
+
+class Dew(Exchange):
     def __init__(self):
         self.cmk = Cmk()
+        super().__init__('dew')
 
     def get_price(self, coin, base='BTC'):
         return self.cmk.get_price(coin, base)

@@ -7,6 +7,7 @@ import requests
 import six
 import time
 from .BinanceExceptions import BinanceAPIException, BinanceRequestException, BinanceWithdrawException
+from ..exchange import Exchange
 
 if six.PY2:
     from urllib import urlencode
@@ -14,9 +15,10 @@ elif six.PY3:
     from urllib.parse import urlencode
 
 
-class Binance:
+class Binance(Exchange):
     def __init__(self, key, secret):
         self.client = Client(key, secret)
+        super().__init__('binance')
 
     def get_price(self, coin, base='BTC', _type=0):
         TYPES = {0: 'bids', 1: 'asks', 2: 'last'}

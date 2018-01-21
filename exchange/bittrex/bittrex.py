@@ -20,6 +20,9 @@ try:
 except ImportError:
     encrypted = False
 
+from ..exchange import Exchange
+
+
 BUY_ORDERBOOK = 'buy'
 SELL_ORDERBOOK = 'sell'
 BOTH_ORDERBOOK = 'both'
@@ -42,13 +45,14 @@ def encrypt(api_key, api_secret, export=True, export_fn='secrets.json'):
     return api
 
 
-class Bittrex(object):
+class Bittrex(Exchange):
     """
     Used for requesting Bittrex with API key and API secret
     """
     def __init__(self, api_key, api_secret):
         self.api_key = str(api_key) if api_key is not None else ''
         self.api_secret = str(api_secret) if api_secret is not None else ''
+        super().__init__('bittrex')
 
     def decrypt(self):
         if encrypted:

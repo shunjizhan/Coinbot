@@ -2,89 +2,85 @@
 # -*- coding: utf-8 -*-
 
 import json
+
 from .HttpUtil import httpGet, httpPost
+from ..exchange import Exchange
 
 
-class Gate:
+class Gate(Exchange):
     def __init__(self, apikey, secretkey):
         self.__url = 'data.gate.io'
         self.__apikey = apikey
         self.__secretkey = secretkey
+        super().__init__('gate')
 
-    #所有交易对
+    # 所有交易对
     def pairs(self):
         URL = "/api2/1/pairs"
-        params=''
-        return httpGet(self.__url,URL,params)
+        params = ''
+        return httpGet(self.__url, URL, params)
 
-
-    #市场订单参数
+    # 市场订单参数
     def marketinfo(self):
         URL = "/api2/1/marketinfo"
-        params=''
-        return httpGet(self.__url,URL,params)
+        params = ''
+        return httpGet(self.__url, URL, params)
 
-    #交易市场详细行情
+    # 交易市场详细行情
     def marketlist(self):
         URL = "/api2/1/marketlist"
-        params=''
-        return httpGet(self.__url,URL,params)
+        params = ''
+        return httpGet(self.__url, URL, params)
 
-    #所有交易行情
+    # 所有交易行情
     def tickers(self):
         URL = "/api2/1/tickers"
-        params=''
-        return httpGet(self.__url,URL,params)
+        params = ''
+        return httpGet(self.__url, URL, params)
 
-    #单项交易行情
-    def ticker(self,param):
+    # 单项交易行情
+    def ticker(self, param):
         URL = "/api2/1/ticker"
-        return httpGet(self.__url,URL,param)
-
+        return httpGet(self.__url, URL, param)
 
     # 所有交易对市场深度
     def orderBooks(self):
         URL = "/api2/1/orderBooks"
-        param=''
+        param = ''
         return httpGet(self.__url, URL, param)
-
 
     # 单项交易对市场深度
-    def orderBook(self,param):
+    def orderBook(self, param):
         URL = "/api2/1/orderBook"
         return httpGet(self.__url, URL, param)
-
 
     # 历史成交记录
     def tradeHistory(self, param):
         URL = "/api2/1/tradeHistory"
         return httpGet(self.__url, URL, param)
 
-    #获取帐号资金余额
+    # 获取帐号资金余额
     def balances(self):
         URL = "/api2/1/private/balances"
         param = {}
-        return httpPost(self.__url,URL,param,self.__apikey,self.__secretkey)
-
+        return httpPost(self.__url, URL, param, self.__apikey, self.__secretkey)
 
     # 获取充值地址
-    def depositAddres(self,param):
+    def depositAddres(self, param):
         URL = "/api2/1/private/depositAddress"
-        params = {'currency':param}
+        params = {'currency': param}
         return httpPost(self.__url, URL, params, self.__apikey, self.__secretkey)
-
 
     # 获取充值提现历史
-    def depositsWithdrawals(self, start,end):
+    def depositsWithdrawals(self, start, end):
         URL = "/api2/1/private/depositsWithdrawals"
-        params = {'start': start,'end':end}
+        params = {'start': start, 'end': end}
         return httpPost(self.__url, URL, params, self.__apikey, self.__secretkey)
 
-
     # 买入
-    def buy(self, currencyPair,rate, amount):
+    def buy(self, currencyPair, rate, amount):
         URL = "/api2/1/private/buy"
-        params = {'currencyPair': currencyPair,'rate':rate,'amount':amount}
+        params = {'currencyPair': currencyPair, 'rate': rate, 'amount': amount}
         return httpPost(self.__url, URL, params, self.__apikey, self.__secretkey)
 
     # 卖出
@@ -99,19 +95,16 @@ class Gate:
         params = {'orderNumber': orderNumber, 'currencyPair': currencyPair}
         return httpPost(self.__url, URL, params, self.__apikey, self.__secretkey)
 
-
     # 取消所有订单
     def cancelAllOrders(self, type, currencyPair):
         URL = "/api2/1/private/cancelAllOrders"
         params = {'type': type, 'currencyPair': currencyPair}
         return httpPost(self.__url, URL, params, self.__apikey, self.__secretkey)
 
-
     # 获取下单状态
     def getOrder(self, orderNumber, currencyPair):
         URL = "/api2/1/private/getOrder"
         return httpPost(self.__url, URL, params, self.__apikey, self.__secretkey)
-
 
     # 获取我的当前挂单列表
     def openOrders(self):
@@ -119,17 +112,16 @@ class Gate:
         params = {}
         return httpPost(self.__url, URL, params, self.__apikey, self.__secretkey)
 
-
     # 获取我的24小时内成交记录
-    def mytradeHistory(self,currencyPair,orderNumber):
+    def mytradeHistory(self, currencyPair, orderNumber):
         URL = "/api2/1/private/tradeHistory"
         params = {'currencyPair': currencyPair, 'orderNumber': orderNumber}
         return httpPost(self.__url, URL, params, self.__apikey, self.__secretkey)
 
     # 提现
-    def withdraw(self,currency,amount,address):
+    def withdraw(self, currency, amount, address):
         URL = "/api2/1/private/withdraw"
-        params = {'currency': currency, 'amount': amount,'address':address}
+        params = {'currency': currency, 'amount': amount, 'address': address}
         return httpPost(self.__url, URL, params, self.__apikey, self.__secretkey)
 
     # ---------------------------------------------------------------------- #

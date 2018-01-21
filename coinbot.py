@@ -2,11 +2,11 @@ import pprint as pp
 import json
 import sys
 
-from bittrex.bittrex import Bittrex
-from coinbase.coinbase import Coinbase
-from binance.binance import Binance
-from gate.gate import Gate
-from dew.dew import Dew
+from exchange.bittrex.bittrex import Bittrex
+from exchange.coinbase.coinbase import Coinbase
+from exchange.binance.binance import Binance
+from exchange.gate.gate import Gate
+from exchange.dew.dew import Dew
 
 
 def p(*args):
@@ -52,10 +52,6 @@ def combine(d1, d2):
     return d1
 
 
-def connect_success(exchange):
-    print('connected %s' % exchange)
-
-
 class Coinbot:
     def __init__(self):
         self.connect_exchanges()
@@ -75,31 +71,34 @@ class Coinbot:
 
         self.gate = Gate(
             key_gate['key'],
-            key_gate['secret']
+            key_gate['secret'],
         )
-        connect_success('gate')
 
         self.coinbase = Coinbase(
             key_coinbase['key'],
             key_coinbase['secret'],
             key_coinbase['pass']
         )
-        connect_success('coinbase')
 
         self.bittrex = Bittrex(
             key_bittrex['key'],
             key_bittrex['secret']
         )
-        connect_success('bittrex')
 
         self.binance = Binance(
             key_binance['key'],
             key_binance['secret']
         )
-        connect_success('binance')
 
         self.dew = Dew()
-        connect_success('dew')
+
+        self.all_exchanges = {
+            'gate': self.gate,
+            'dew': self.dew,
+            'coinbase': self.coinbase,
+            'binance': self.binance,
+            'bittrex': self.bittrex,
+        }
 
         print('')
 
@@ -169,21 +168,13 @@ class Coinbot:
             }
         }
 
-        all_exchanges = {
-            'gate': self.gate,
-            'dew': self.dew,
-            'coinbase': self.coinbase,
-            'binance': self.binance,
-            'bittrex': self.bittrex,
-        }
-
-        for ex_name, exchange in all_exchanges.items():
+        for ex_name, exchange in self.all_exchanges.items():
             coins = exchange.get_coin_balance()
             combine(all_coins, coins)
             p(ex_name + ': '),
             show_coins(coins)
 
-        p('Out:     ' + str(USD_out) + ' 100%'),
+        print('Out:     ' + str(USD_out) + ' 100%'),
 
         p('Total:   '),
         show_coins(all_coins, full=full, USD_out=USD_out)
