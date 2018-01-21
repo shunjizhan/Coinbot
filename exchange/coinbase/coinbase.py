@@ -12,9 +12,13 @@ from ..exchange import Exchange
 
 class Coinbase(Exchange):
     def __init__(self, api_key, secret_key, passphrase):
+        super().__init__('coinbase')
         self.api_base_url = 'https://api.gdax.com/'
         self.auth = CoinbaseAuth(api_key, secret_key, passphrase)
-        super().__init__('coinbase')
+        self.connect_success()
+
+    def get_BTC_price(self):
+        return self.get_price('BTC', base='USD')
 
     def get_price(self, coin, base='BTC', _type=0):
         TYPES = {0: 'bids', 1: 'asks'}
@@ -23,9 +27,6 @@ class Coinbase(Exchange):
 
         api_url = self.api_base_url + 'products/%s-%s/book?level=1' % (coin, base)
         return float(requests.get(api_url, auth=self.auth).json()[TYPES[_type]][0][0])
-
-    def get_BTC_price(self):
-        return self.get_price('BTC', base='USD')
 
     def get_coin_balance(self):
         account = requests.get(self.api_base_url + 'accounts', auth=self.auth).json()

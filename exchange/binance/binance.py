@@ -17,22 +17,23 @@ elif six.PY3:
 
 class Binance(Exchange):
     def __init__(self, key, secret):
-        self.client = Client(key, secret)
         super().__init__('binance')
-
-    def get_price(self, coin, base='BTC', _type=0):
-        TYPES = {0: 'bids', 1: 'asks', 2: 'last'}
-        pair = coin + base
-        if self.client.get_symbol_info(pair):
-            return float(self.client.get_order_book(symbol=pair)[TYPES[_type]][0][0])
-        else:
-            return 0
+        self.api = BinanceAPI(key, secret)
+        self.connect_success()
 
     def get_BTC_price(self):
         return self.get_price('BTC', base='USDT')
 
+    def get_price(self, coin, base='BTC', _type=0):
+        TYPES = {0: 'bids', 1: 'asks', 2: 'last'}
+        pair = coin + base
+        if self.api.get_symbol_info(pair):
+            return float(self.api.get_order_book(symbol=pair)[TYPES[_type]][0][0])
+        else:
+            return 0
+
     def get_coin_balance(self):
-        balances = self.client.get_account()['balances']
+        balances = self.api.get_account()['balances']
         BTC_price = self.get_BTC_price()
 
         coins = {'total': {'BTC': 0, 'USD': 0, 'num': 0}}
@@ -59,10 +60,10 @@ class Binance(Exchange):
         return coins
 
 
-# ------------------------------------------------------------ #
-# ------------------------- API Wrapper ---------------------- #
-# ------------------------------------------------------------ #
-class Client(object):
+# ------------------------------------------------------------------ #
+# --------------------------- API Wrapper -------------------------- #
+# ------------------------------------------------------------------ #
+class BinanceAPI(object):
     API_URL = 'https://api.binance.com/api'
     WITHDRAW_API_URL = 'https://api.binance.com/wapi'
     WEBSITE_URL = 'https://www.binance.com'

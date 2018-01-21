@@ -5,11 +5,12 @@ from ..exchange import Exchange
 
 class Dew(Exchange):
     def __init__(self):
-        self.cmk = Cmk()
         super().__init__('dew')
+        self.api = Cmk()
+        self.connect_success()
 
     def get_price(self, coin, base='BTC'):
-        return self.cmk.get_price(coin, base)
+        return self.api.get_price(coin, base)
 
     def get_coin_balance(self):
         balances = {
@@ -35,6 +36,9 @@ class Dew(Exchange):
         return coins
 
 
+# ------------------------------------------------------------------ #
+# --------------------------- API Wrapper -------------------------- #
+# ------------------------------------------------------------------ #
 class Cmk:
     def __init__(self):
         self.base_url = 'https://api.coinmarketcap.com/v1/'

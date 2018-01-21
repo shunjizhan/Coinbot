@@ -9,10 +9,53 @@ from ..exchange import Exchange
 
 class Gate(Exchange):
     def __init__(self, apikey, secretkey):
+        super().__init__('gate')
+        self.api = GateAPI(apikey, secretkey)
+        self.connect_success()
+
+    def get_price(self, coin, base='BTC', _type=0):
+        TYPES = {0: 'highestBid', 1: 'lowestAsk', 2: 'last'}
+        pair = '%s_%s' % (coin, base)
+        ticker = self.api.ticker(pair)[TYPES[_type]]
+        return float(ticker) if ticker else 0
+
+    def get_coin_balance(self):
+        balances = json.loads(self.api.balances())['available']
+        ETH_price = float(self.api.ticker('eth_usdt')['last'])
+        BTC_price = float(self.api.ticker('btc_usdt')['last'])
+
+        coins = {'total': {'BTC': 0, 'USD': 0, 'num': 0}}
+        for coinName in balances:
+            num = float(balances[coinName])
+            if coinName == 'USDT':
+                coinName = 'USD'
+                USD_value = num
+            elif coinName == 'BTC':
+                USD_value = num / BTC_price
+            elif coinName in {'FIL', 'ETH'}:
+                USD_value = num * float(self.api.ticker('FIL_usdt')['last'])
+            else:
+                pair = '%s_eth' % coinName
+                price_in_USD = float(self.api.ticker(pair)['last']) * ETH_price
+                USD_value = price_in_USD * num
+            BTC_value = USD_value / BTC_price
+
+            # update info
+            coins[coinName] = {
+                'num': num,
+                'BTC': BTC_value,
+                'USD': USD_value
+            }
+            coins['total']['BTC'] += BTC_value
+            coins['total']['USD'] += USD_value
+        return coins
+
+
+class GateAPI(Exchange):
+    def __init__(self, apikey, secretkey):
         self.__url = 'data.gate.io'
         self.__apikey = apikey
         self.__secretkey = secretkey
-        super().__init__('gate')
 
     # 所有交易对
     def pairs(self):
@@ -123,43 +166,3 @@ class Gate(Exchange):
         URL = "/api2/1/private/withdraw"
         params = {'currency': currency, 'amount': amount, 'address': address}
         return httpPost(self.__url, URL, params, self.__apikey, self.__secretkey)
-
-    # ---------------------------------------------------------------------- #
-    # ----------------------------- my functions --------------------------- #
-    # ---------------------------------------------------------------------- #
-    def get_price(self, coin, base='BTC', _type=0):
-        TYPES = {0: 'highestBid', 1: 'lowestAsk', 2: 'last'}
-        pair = '%s_%s' % (coin, base)
-        ticker = self.ticker(pair)[TYPES[_type]]
-        return float(ticker) if ticker else 0
-
-    def get_coin_balance(self):
-        balances = json.loads(self.balances())['available']
-        ETH_price = float(self.ticker('eth_usdt')['last'])
-        BTC_price = float(self.ticker('btc_usdt')['last'])
-
-        coins = {'total': {'BTC': 0, 'USD': 0, 'num': 0}}
-        for coinName in balances:
-            num = float(balances[coinName])
-            if coinName == 'USDT':
-                coinName = 'USD'
-                USD_value = num
-            elif coinName == 'BTC':
-                USD_value = num / BTC_price
-            elif coinName in {'FIL', 'ETH'}:
-                USD_value = num * float(self.ticker('FIL_usdt')['last'])
-            else:
-                pair = '%s_eth' % coinName
-                price_in_USD = float(self.ticker(pair)['last']) * ETH_price
-                USD_value = price_in_USD * num
-            BTC_value = USD_value / BTC_price
-
-            # update info
-            coins[coinName] = {
-                'num': num,
-                'BTC': BTC_value,
-                'USD': USD_value
-            }
-            coins['total']['BTC'] += BTC_value
-            coins['total']['USD'] += USD_value
-        return coins

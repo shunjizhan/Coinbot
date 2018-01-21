@@ -23,6 +23,55 @@ except ImportError:
 from ..exchange import Exchange
 
 
+class Bittrex(Exchange):
+    def __init__(self, api_key, api_secret):
+        super().__init__('bittrex')
+        self.api = BittrexAPI(api_key, api_secret)
+        self.connect_success()
+
+    def get_BTC_price(self):
+        return float(self.api.get_ticker('USDT-BTC')['result']['Last'])
+
+    def get_price(self, coin, base='BTC', _type=0):
+        TYPES = {0: 'Bid', 1: 'Ask', 2: 'Last'}
+        pair = '%s-%s' % (base, coin)
+        ticker = self.api.get_ticker(pair)['result']
+        if (ticker is not None and ticker[TYPES[_type]] is not None):
+            return float(ticker['Last'])
+        else:
+            return 0
+
+    def get_coin_balance(self):
+        balances = self.api.get_balances()
+        BTC_price = self.get_BTC_price()
+
+        coins = {'total': {'BTC': 0, 'USD': 0, 'num': 0}}
+        for coin in balances['result']:
+            coinName = coin['Currency']
+            num = coin['Balance']
+            if coinName == 'USDT':
+                coinName = 'USD'
+                BTC_value = num / BTC_price
+            elif coinName == 'BTC':
+                BTC_value = num
+            else:
+                BTC_value = self.get_price(coinName) * num
+            USD_value = BTC_value * BTC_price
+
+            # update info
+            coins[coinName] = {
+                'num': num,
+                'BTC': BTC_value,
+                'USD': USD_value
+            }
+            coins['total']['BTC'] += BTC_value
+            coins['total']['USD'] += USD_value
+        return coins
+
+
+# ------------------------------------------------------------------ #
+# --------------------------- API Wrapper -------------------------- #
+# ------------------------------------------------------------------ #
 BUY_ORDERBOOK = 'buy'
 SELL_ORDERBOOK = 'sell'
 BOTH_ORDERBOOK = 'both'
@@ -45,14 +94,13 @@ def encrypt(api_key, api_secret, export=True, export_fn='secrets.json'):
     return api
 
 
-class Bittrex(Exchange):
+class BittrexAPI:
     """
     Used for requesting Bittrex with API key and API secret
     """
     def __init__(self, api_key, api_secret):
         self.api_key = str(api_key) if api_key is not None else ''
         self.api_secret = str(api_secret) if api_secret is not None else ''
-        super().__init__('bittrex')
 
     def decrypt(self):
         if encrypted:
@@ -308,45 +356,3 @@ class Bittrex(Exchange):
         :rtype : dict
         """
         return self.api_query('getorder', {'uuid': uuid})
-
-    # ---------------------------------------------------------------------- #
-    # ----------------------------- my functions --------------------------- #
-    # ---------------------------------------------------------------------- #
-    def get_BTC_price(self):
-        return float(self.get_ticker('USDT-BTC')['result']['Last'])
-
-    def get_price(self, coin, base='BTC', _type=0):
-        TYPES = {0: 'Bid', 1: 'Ask', 2: 'Last'}
-        pair = '%s-%s' % (base, coin)
-        ticker = self.get_ticker(pair)['result']
-        if (ticker is not None and ticker[TYPES[_type]] is not None):
-            return float(ticker['Last'])
-        else:
-            return 0
-
-    def get_coin_balance(self):
-        balances = self.get_balances()
-        BTC_price = self.get_BTC_price()
-
-        coins = {'total': {'BTC': 0, 'USD': 0, 'num': 0}}
-        for coin in balances['result']:
-            coinName = coin['Currency']
-            num = coin['Balance']
-            if coinName == 'USDT':
-                coinName = 'USD'
-                BTC_value = num / BTC_price
-            elif coinName == 'BTC':
-                BTC_value = num
-            else:
-                BTC_value = self.get_price(coinName) * num
-            USD_value = BTC_value * BTC_price
-
-            # update info
-            coins[coinName] = {
-                'num': num,
-                'BTC': BTC_value,
-                'USD': USD_value
-            }
-            coins['total']['BTC'] += BTC_value
-            coins['total']['USD'] += USD_value
-        return coins
