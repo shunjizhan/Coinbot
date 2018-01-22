@@ -85,20 +85,39 @@ class Coinbot:
 
     def get_diff_rate(self, coin, base, min_diff, _type=0):
         # set up bijection between exchange and price
-        exchange_price = {}
+        ex_price = {}
         for ex_name, exchange in self.trading_exchanges.items():
-            exchange_price[ex_name] = exchange.get_price(coin, base, _type)
-        price_exchange = {v: k for k, v in exchange_price.items()}
+            ex_price[ex_name] = exchange.get_price(coin, base, _type)
+        price_ex = {v: k for k, v in ex_price.items()}
 
-        prices = exchange_price.values()
+        prices = ex_price.values()
         if 0 in prices:
             return 0
 
+        # calculate diff
         high, low = max(prices), min(prices)
-        diff = (high - low) / high if high > 0 else 0
+        diff = (high - low) / high if low > 0 else 0
         if diff >= min_diff:
-            # need more accurate diff calculation with bids and asks price
-            print('%s-%s %.1f' % (coin, base, diff * 100) + '%  ' + '%s > %s' % (price_exchange[high], price_exchange[low]))
+            ex_high = price_ex[high]
+            ex_low = price_ex[low]
+            bid = self.trading_exchanges[ex_high].get_price(coin, base, 0)
+            ask = self.trading_exchanges[ex_low].get_price(coin, base, 1)
+            real_diff = (bid - ask) / bid
+            # if real_diff < 0:
+            #     bid = self.trading_exchanges[ex_low].get_price(coin, base, 0)
+            #     ask = self.trading_exchanges[ex_high].get_price(coin, base, 1)
+            #     real_diff = (bid - ask) / bid
+
+            # need more accurate diff calculation with market depth
+            if real_diff >= min_diff:
+                print('')
+                print(
+                    round(low * 1000, 4),
+                    round(high * 1000, 4),
+                    round(ask * 1000, 4),
+                    round(bid * 1000, 4)
+                )
+                print('{:s}-{:s} {:.1f}% {:.1f}% {:s} > {:s}'.format(coin, base, diff * 100, real_diff * 100, ex_high, ex_low))
         # else:
         #     print('%s-%s X' % (coin, base))
 

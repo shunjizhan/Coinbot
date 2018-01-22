@@ -205,7 +205,7 @@ class BittrexAPI:
         """
         return self.api_query('getmarketsummary', {'market': market})
 
-    def get_orderbook(self, market, depth_type, depth=20):
+    def get_orderbook(self, market, depth_type, depth=5):
         """
         Used to get retrieve the orderbook for a given market
         :param market: String literal for the market (ex: BTC-LTC)
