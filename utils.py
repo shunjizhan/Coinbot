@@ -60,3 +60,23 @@ def combine_coins(d1, d2):
         else:
             d1[coin] = info
     return d1
+
+
+def combine_markets(m1, m2):
+    '''
+    combine two markets with format {
+        'BTC': {'ADA', 'BAT', 'BTG', ...},
+        'ETH': {'BAT', 'BNT', 'DNT', 'ETC', ...},
+        'USDT': {'NEO', 'BTC', 'LTC', ...}
+        ...
+    }
+    '''
+    if m1 == {}:
+        return m2
+    if m2 == {}:
+        return m1
+
+    assert(m1.keys() == m2.keys())
+    for base in m2:
+        m1[base] &= m2[base]
+    return m1

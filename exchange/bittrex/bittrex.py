@@ -68,6 +68,16 @@ class Bittrex(Exchange):
             coins['total']['USD'] += USD_value
         return coins
 
+    def get_trading_pairs(self):
+        markets = {}
+        for base in self.market_bases:
+            markets[base] = set()
+            bittrex_markets = self.api.get_markets()['result']
+            for info in bittrex_markets:
+                if info['BaseCurrency'] == base:
+                    markets[base].add(info['MarketCurrency'])
+        return markets
+
 
 # ------------------------------------------------------------------ #
 # --------------------------- API Wrapper -------------------------- #

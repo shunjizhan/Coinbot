@@ -50,7 +50,21 @@ class Gate(Exchange):
             coins['total']['USD'] += USD_value
         return coins
 
+    def get_trading_pairs(self):
+        markets = {}
+        for base in self.market_bases:
+            markets[base] = set()
+            gate_markets = self.api.pairs()
+            for pair in gate_markets:
+                coin, gate_base = pair.split('_')
+                if gate_base.upper() == base:
+                    markets[base].add(coin.upper())
+        return markets
 
+
+# ------------------------------------------------------------------ #
+# --------------------------- API Wrapper -------------------------- #
+# ------------------------------------------------------------------ #
 class GateAPI(Exchange):
     def __init__(self, apikey, secretkey):
         self.__url = 'data.gate.io'

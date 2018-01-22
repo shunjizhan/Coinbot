@@ -59,6 +59,16 @@ class Binance(Exchange):
             coins['total']['USD'] += USD_value
         return coins
 
+    def get_trading_pairs(self):
+        markets = {}
+        for base in self.market_bases:
+            markets[base] = set()
+            binance_markets = self.api.get_products()['data']
+            for info in binance_markets:
+                if info['quoteAsset'] == base:
+                    markets[base].add(info['baseAsset'])
+        return markets
+
 
 # ------------------------------------------------------------------ #
 # --------------------------- API Wrapper -------------------------- #

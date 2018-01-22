@@ -1,7 +1,7 @@
 import pprint as pp
 import json
 
-from utils import p, show_coins, combine_coins
+from utils import p, show_coins, combine_coins, combine_markets
 from exchange.bittrex.bittrex import Bittrex
 from exchange.coinbase.coinbase import Coinbase
 from exchange.binance.binance import Binance
@@ -57,39 +57,26 @@ class Coinbot:
             'bittrex': self.bittrex,
         }
 
+        self.trading_exchanges = {
+            'gate': self.gate,
+            'binance': self.binance,
+            'bittrex': self.bittrex,
+        }
+
         print('')
 
     # --------------------------------------------------------------------------------------------- #
     # ------------------------------------------ View --------------------------------------------- #
     # --------------------------------------------------------------------------------------------- #
     def get_all_diff_rate(self, min_diff=0.03):
-        bases = {'BTC', 'ETH', 'USDT'}
         all_markets = {}
-        cur_markets = {}
-        for base in bases:
-            cur_markets[base] = set()
-            bittrex_markets = self.bittrex.get_markets()['result']
-            for info in bittrex_markets:
-                if info['BaseCurrency'] == base:
-                    cur_markets[base].add(info['MarketCurrency'])
-            all_markets[base] = cur_markets[base]
-
-            cur_markets[base] = set()
-            binance_markets = self.binance.client.get_products()['data']
-            for info in binance_markets:
-                if info['quoteAsset'] == base:
-                    cur_markets[base].add(info['baseAsset'])
-            all_markets[base] &= cur_markets[base]
-
-            cur_markets[base] = set()
-            gate_markets = self.gate.pairs()
-            for pair in gate_markets:
-                coin, gate_base = pair.split('_')
-                if gate_base.upper() == base:
-                    cur_markets[base].add(coin.upper())
-            all_markets[base] &= cur_markets[base]
-
+        for ex_name, exchange in self.trading_exchanges.items():
+            all_markets = combine_markets(
+                all_markets,
+                exchange.get_trading_pairs()
+            )
         pp.pprint(all_markets)
+
         while True:
             print('----------------------------------------')
             for base, markets in all_markets.items():
@@ -97,10 +84,10 @@ class Coinbot:
                     self.get_diff_rate(coin, base, min_diff)
 
     def get_diff_rate(self, coin, base, min_diff, _type=0):
+        # set up bijection between exchange and price
         exchange_price = {}
-        exchange_price['binance'] = self.binance.get_price(coin, base, _type)
-        exchange_price['bittrex'] = self.bittrex.get_price(coin, base, _type)
-        exchange_price['gate'] = self.gate.get_price(coin, base, _type)
+        for ex_name, exchange in self.trading_exchanges.items():
+            exchange_price[ex_name] = exchange.get_price(coin, base, _type)
         price_exchange = {v: k for k, v in exchange_price.items()}
 
         prices = exchange_price.values()
@@ -137,6 +124,7 @@ class Coinbot:
         show_coins(all_coins, full=full, USD_out=USD_out)
 
     def get_bittrex_profit_ratio(self, base=200):
+        # *** not updated ***
         coins = self.bittrex.get_coin_balance()
         for coin, count in coins.items():
             ticker = self.bittrex.get_ticker('BTC-' + coin)['result']
@@ -152,6 +140,7 @@ class Coinbot:
     # ----------------------------------------- Trade --------------------------------------------- #
     # --------------------------------------------------------------------------------------------- #
     def buy_all_bittrex(self, USD_total=200.0):
+        # *** not updated ***
         dontTouch = self.dontTouch
         allCoins = self.bittrex.get_balances()['result']
 
@@ -173,6 +162,7 @@ class Coinbot:
                         # break
 
     def sell_all_bittrex(self):
+        # *** not updated ***
         dontTouch = self.dontTouch
         allCoins = self.bittrex.get_balances()['result']
 
@@ -201,6 +191,7 @@ class Coinbot:
         print(total, total / count)
 
     def buy_all_binance(self, USD_total=200.0):
+        # *** not updated ***
         dontTouch = self.dontTouch
         balances = self.binance.client.get_account()['balances']
 
@@ -225,6 +216,7 @@ class Coinbot:
                             result = self.binance.client.order_market_buy(symbol=pair, quantity=quantity)
 
     def sell_all_binance(self):
+        # *** not updated ***
         dontTouch = self.dontTouch
         all_coins = self.binance.get_coin_balance()
 
