@@ -9,8 +9,8 @@ from ..exchange import Exchange
 
 class Gate(Exchange):
     def __init__(self, apikey, secretkey):
-        super().__init__('gate')
         self.api = GateAPI(apikey, secretkey)
+        super().__init__('gate')
         self.connect_success()
 
     def get_pair(self, coin, base):
@@ -53,7 +53,7 @@ class Gate(Exchange):
             coins['total']['USD'] += USD_value
         return coins
 
-    def get_coin_balance(self, allow_zero):
+    def get_all_coin_balance(self, allow_zero=False):
         balances = json.loads(self.api.balances())['available']
         coins = {}
         for coinName in balances:

@@ -138,10 +138,10 @@ class Coinbot:
         p('Total:   '),
         show_coins(all_coins, full=full, USD_out=USD_out)
 
-    def get_coin_balance(self, allow_zero=False):
+    def get_all_coin_balance(self, allow_zero=False):
         pp.pprint(self.all_exchanges)
         for ex_name, exchange in self.all_exchanges.items():
-            coins = exchange.get_coin_balance(allow_zero)
+            coins = exchange.get_all_coin_balance(allow_zero)
             print('--------------------------')
             print(ex_name)
             print(coins)

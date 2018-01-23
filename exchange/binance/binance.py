@@ -17,9 +17,12 @@ elif six.PY3:
 
 class Binance(Exchange):
     def __init__(self, key, secret):
-        super().__init__('binance')
         self.api = BinanceAPI(key, secret)
+        super().__init__('binance')
         self.connect_success()
+
+    def get_step_size(self, pair):
+        return self.api.get_symbol_info(pair)['filters'][1]['stepSize']
 
     def get_pair(self, coin, base):
         return coin + base
@@ -62,7 +65,7 @@ class Binance(Exchange):
             coins['total']['USD'] += USD_value
         return coins
 
-    def get_coin_balance(self, allow_zero):
+    def get_all_coin_balance(self, allow_zero=False):
         balances = self.api.get_account()['balances']
         coins = {}
         for coin in balances:
@@ -86,11 +89,39 @@ class Binance(Exchange):
 
     def market_buy(self, coin, base='BTC', quantity=0):
         pair = self.get_pair(coin, base)
-        self.api.order_market_buy(pair, quantity)
+        response = self.api.order_market_buy(symbol=pair, quantity=quantity)
+        return {
+            'exchange': self.name,
+            'side': 'sell',
+            'pair': self.get_my_pair(coin, base),
+            'price': response['price'],
+            'quantity': response['executedQty'],
+            'id': response['orderId'],
+            'id2': response['clientOrderId']
+        }
 
     def market_sell(self, coin, base='BTC', quantity=0):
         pair = self.get_pair(coin, base)
-        self.api.order_market_sell(pair, quantity)
+        response = self.api.order_market_sell(symbol=pair, quantity=quantity)
+        return {
+            'exchange': self.name,
+            'side': 'sell',
+            'pair': self.get_my_pair(coin, base),
+            'price': response['price'],
+            'quantity': response['executedQty'],
+            'id': response['orderId'],
+            'id2': response['clientOrderId']
+        }
+
+    def market_sell_all(self, coin, base='BTC'):
+        quantity = self.get_coin_balance(coin)
+        if quantity <= 0:
+            print('%s does not have enough balance to sell')
+            return None
+        else:
+            step = self.get_step_size(self.get_pair(coin, base))
+            quantity = quantity - (quantity % float(step))
+            return self.market_sell(coin, base=base, quantity=quantity)
 
 
 # ------------------------------------------------------------------ #

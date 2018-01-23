@@ -16,9 +16,12 @@ if __name__ == '__main__':
         bot.get_full_balance(full=True)
     elif sys.argv[1] == 'diff':
         bot.get_all_diff_rate(min_diff=0.01)
+    elif sys.argv[1] == 'coins':
+        bot.get_all_coin_balance()
     elif sys.argv[1] == 'test':
         # p(bot.binance.api.get_order_book(symbol='NEOUSDT'))
         # p(bot.bittrex.api.get_orderbook('USDT-NEO', 'both', 3)['result'])
-        bot.get_coin_balance()
+        res = bot.binance.market_sell_all('ZRX')
+        p(res)
     else:
         print('nothing to do...')

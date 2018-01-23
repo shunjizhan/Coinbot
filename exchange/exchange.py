@@ -2,20 +2,25 @@ class Exchange:
     def __init__(self, name):
         self.name = name
         self.market_bases = {'BTC', 'ETH', 'USDT'}
+        self.coins = self.get_all_coin_balance()
         self.dontTouch = {'XRP', 'XEM', 'BTC', 'DOGE', 'SC', 'NEO', 'ZEC', 'BTG', 'MONA', 'WINGS', 'USDT', 'IOTA', 'EOS', 'QTUM', 'ADA', 'XLM', 'LSK', 'BTS', 'XMR', 'DASH', 'SNT', 'BCC', 'BCH', 'SBTC', 'BCX', 'ETF', 'LTC', 'ETH'}
 
     def connect_success(self):
         print('connected %s' % self.name)
 
     def get_pair(self, coin, base):
-        # return a the specific pair format for that exchange
-        pass
+        # return the specific pair format for this exchange
+        raise NotImplementedError("Please Implement this method")
+
+    def get_my_pair(self, coin, base):
+        # return my format
+        return '%s-%s' % (coin, base)
 
     def get_BTC_price(self):
-        pass
+        raise NotImplementedError("Please Implement this method")
 
     def get_price(self, coin, base='BTC'):
-        pass
+        raise NotImplementedError("Please Implement this method")
 
     def get_full_balance(self):
         '''
@@ -31,9 +36,9 @@ class Exchange:
             ...
         }
         '''
-        pass
+        raise NotImplementedError("Please Implement this method")
 
-    def get_coin_balance(self, allow_zero):
+    def get_all_coin_balance(self, allow_zero=False):
         '''
         return format {
             coinName1: num1,
@@ -41,7 +46,7 @@ class Exchange:
             ...
         }
         '''
-        pass
+        raise NotImplementedError("Please Implement this method")
 
     def get_trading_pairs(self):
         '''
@@ -52,19 +57,36 @@ class Exchange:
             ...
         }
         '''
-        pass
+        raise NotImplementedError("Please Implement this method")
 
-    def market_buy(self, coin, base, quantity):
-        pass
+    def get_coin_balance(self, coin):
+        if coin in self.coins.keys():
+            return self.coins[coin]
+        else:
+            return 0
 
-    def market_sell(self, coin, base, quantity):
-        pass
+    def market_buy(self, coin, base='BTC', quantity=0):
+        raise NotImplementedError("Please Implement this method")
 
-    def buy_all(self, USD_price):
-        pass
+    def market_sell(self, coin, base='BTC', quantity=0):
+        raise NotImplementedError("Please Implement this method")
 
-    def sell_all(self):
-        pass
+    def market_sell_all(self, coin, base='BTC'):
+        quantity = self.get_coin_balance(coin)
+        if quantity <= 0:
+            print('%s does not have enough balance to sell')
+            return None
+        else:
+            return self.market_sell(coin, base=base, quantity=quantity)
+
+    def market_buy_everything(self, USD_price):
+        raise NotImplementedError("Please Implement this method")
+
+    def market_sell_everything(self):
+        res = {}
+        for coin, num in self.coins.items():
+            if coin not in self.dontTouch:
+                self.market_sell(coin, 'BTC', num / 10)
 
 
 

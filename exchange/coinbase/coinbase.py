@@ -12,9 +12,9 @@ from ..exchange import Exchange
 
 class Coinbase(Exchange):
     def __init__(self, api_key, secret_key, passphrase):
-        super().__init__('coinbase')
         self.api_base_url = 'https://api.gdax.com/'
         self.auth = CoinbaseAuth(api_key, secret_key, passphrase)
+        super().__init__('coinbase')
         self.connect_success()
 
     def get_pair(self, coin, base):
@@ -56,7 +56,7 @@ class Coinbase(Exchange):
             coins['total']['USD'] += USD_value
         return coins
 
-    def get_coin_balance(self, allow_zero):
+    def get_all_coin_balance(self, allow_zero=False):
         account = requests.get(self.api_base_url + 'accounts', auth=self.auth).json()
         coins = {}
         for acc in account:

@@ -25,8 +25,8 @@ from ..exchange import Exchange
 
 class Bittrex(Exchange):
     def __init__(self, api_key, api_secret):
-        super().__init__('bittrex')
         self.api = BittrexAPI(api_key, api_secret)
+        super().__init__('bittrex')
         self.connect_success()
 
     def get_pair(self, coin, base):
@@ -71,7 +71,7 @@ class Bittrex(Exchange):
             coins['total']['USD'] += USD_value
         return coins
 
-    def get_coin_balance(self, allow_zero):
+    def get_all_coin_balance(self, allow_zero=False):
         balances = self.api.get_balances()
         coins = {}
         for coin in balances['result']:
