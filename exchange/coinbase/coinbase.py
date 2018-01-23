@@ -17,6 +17,9 @@ class Coinbase(Exchange):
         self.auth = CoinbaseAuth(api_key, secret_key, passphrase)
         self.connect_success()
 
+    def get_pair(self, coin, base):
+        return '%s-%s' % (coin, base)
+
     def get_BTC_price(self):
         return self.get_price('BTC', base='USD')
 
@@ -25,7 +28,8 @@ class Coinbase(Exchange):
         if coin not in {'BTC', 'ETH', 'BCH', 'LTC'}:
             raise Exception('this coin (%s) is not in GDAX!' % coin)
 
-        api_url = self.api_base_url + 'products/%s-%s/book?level=1' % (coin, base)
+        pair = self.get_pair(coin, base)
+        api_url = self.api_base_url + 'products/%s/book?level=1' % pair
         return float(requests.get(api_url, auth=self.auth).json()[TYPES[_type]][0][0])
 
     def get_coin_balance(self):

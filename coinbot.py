@@ -118,8 +118,6 @@ class Coinbot:
                     round(bid * 1000, 4)
                 )
                 print('{:s}-{:s} {:.1f}% {:.1f}% {:s} > {:s}'.format(coin, base, diff * 100, real_diff * 100, ex_high, ex_low))
-        # else:
-        #     print('%s-%s X' % (coin, base))
 
     def get_all_coins(self, full=False):
         USD_out = 2000 + 8888 + 8338

@@ -21,12 +21,15 @@ class Binance(Exchange):
         self.api = BinanceAPI(key, secret)
         self.connect_success()
 
+    def get_pair(self, coin, base):
+        return coin + base
+
     def get_BTC_price(self):
         return self.get_price('BTC', base='USDT')
 
     def get_price(self, coin, base='BTC', _type=0):
         TYPES = {0: 'bids', 1: 'asks', 2: 'last'}
-        pair = coin + base
+        pair = self.get_pair(coin, base)
         if self.api.get_symbol_info(pair):
             return float(self.api.get_order_book(symbol=pair)[TYPES[_type]][0][0])
         else:
@@ -68,6 +71,12 @@ class Binance(Exchange):
                 if info['quoteAsset'] == base:
                     markets[base].add(info['baseAsset'])
         return markets
+
+    def market_buy(self, coin, base='BTC', quantity=0):
+        pass
+
+    def market_sell(self, coin, base='BTC', quantity=0):
+        pass
 
 
 # ------------------------------------------------------------------ #

@@ -6,6 +6,10 @@ class Exchange:
     def connect_success(self):
         print('connected %s' % self.name)
 
+    def get_pair(self, coin, base):
+        # return a the specific pair format for that exchange
+        pass
+
     def get_BTC_price(self):
         pass
 
@@ -38,3 +42,16 @@ class Exchange:
         }
         '''
         pass
+
+    def market_buy(self, coin, base, quantity):
+        pass
+
+    def market_sell(self, coin, base, quantity):
+        pass
+
+
+
+
+
+
+

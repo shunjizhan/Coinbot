@@ -13,9 +13,12 @@ class Gate(Exchange):
         self.api = GateAPI(apikey, secretkey)
         self.connect_success()
 
+    def get_pair(self, coin, base):
+        return '%s_%s' % (coin, base)
+
     def get_price(self, coin, base='BTC', _type=0):
         TYPES = {0: 'highestBid', 1: 'lowestAsk', 2: 'last'}
-        pair = '%s_%s' % (coin, base)
+        pair = self.get_pair(coin, base)
         ticker = self.api.ticker(pair)[TYPES[_type]]
         return float(ticker) if ticker else 0
 

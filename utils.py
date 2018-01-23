@@ -30,7 +30,7 @@ def show_coins(coins, full=False, USD_out=0):
         total_USD = coins['total']['USD']
         coinslist = sorted(coins.items(), key=lambda kv: kv[1]['USD'], reverse=True)
         for coin, info in coinslist:
-            if info['USD'] > 0:
+            if info['USD'] > -10000:
                 info['ratio'] = round(info['USD'] * 100.0 / total_USD, 1)
                 print(coin, info)
     else:
