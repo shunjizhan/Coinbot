@@ -22,7 +22,11 @@ class Binance(Exchange):
         self.connect_success()
 
     def get_step_size(self, pair):
-        return self.api.get_symbol_info(pair)['filters'][1]['stepSize']
+        info = self.api.get_symbol_info(pair)
+        if info:
+            return float(info['filters'][1]['stepSize'])
+        else:
+            return -1
 
     def get_pair(self, coin, base):
         return coin + base
@@ -120,8 +124,9 @@ class Binance(Exchange):
             return None
         else:
             step = self.get_step_size(self.get_pair(coin, base))
-            quantity = quantity - (quantity % float(step))
-            return self.market_sell(coin, base=base, quantity=quantity)
+            if step > 0 and quantity >= step:
+                quantity = quantity - (quantity % float(step))
+                return self.market_sell(coin, base=base, quantity=quantity)
 
 
 # ------------------------------------------------------------------ #

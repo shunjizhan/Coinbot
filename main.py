@@ -21,7 +21,7 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'test':
         # p(bot.binance.api.get_order_book(symbol='NEOUSDT'))
         # p(bot.bittrex.api.get_orderbook('USDT-NEO', 'both', 3)['result'])
-        res = bot.binance.market_sell_all('ZRX')
+        res = bot.binance.market_sell_all()
         p(res)
     else:
         print('nothing to do...')

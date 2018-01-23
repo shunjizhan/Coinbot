@@ -3,7 +3,7 @@ class Exchange:
         self.name = name
         self.market_bases = {'BTC', 'ETH', 'USDT'}
         self.coins = self.get_all_coin_balance()
-        self.dontTouch = {'XRP', 'XEM', 'BTC', 'DOGE', 'SC', 'NEO', 'ZEC', 'BTG', 'MONA', 'WINGS', 'USDT', 'IOTA', 'EOS', 'QTUM', 'ADA', 'XLM', 'LSK', 'BTS', 'XMR', 'DASH', 'SNT', 'BCC', 'BCH', 'SBTC', 'BCX', 'ETF', 'LTC', 'ETH'}
+        self.dontTouch = {'XRP', 'XEM', 'BTC', 'DOGE', 'SC', 'NEO', 'ZEC', 'BTG', 'MONA', 'WINGS', 'USDT', 'IOTA', 'EOS', 'QTUM', 'ADA', 'XLM', 'LSK', 'BTS', 'XMR', 'DASH', 'SNT', 'BCC', 'BCH', 'SBTC', 'BCX', 'ETF', 'LTC', 'ETH', 'BNB', 'ADA', 'BTS', 'SNT'}
 
     def connect_success(self):
         print('connected %s' % self.name)
@@ -65,6 +65,7 @@ class Exchange:
         else:
             return 0
 
+    # ----------- might need to update self.coins after buy/sell ----------- #
     def market_buy(self, coin, base='BTC', quantity=0):
         raise NotImplementedError("Please Implement this method")
 
@@ -74,7 +75,7 @@ class Exchange:
     def market_sell_all(self, coin, base='BTC'):
         quantity = self.get_coin_balance(coin)
         if quantity <= 0:
-            print('%s does not have enough balance to sell')
+            print('%s does not have enough balance to sell' % coin)
             return None
         else:
             return self.market_sell(coin, base=base, quantity=quantity)
@@ -83,10 +84,13 @@ class Exchange:
         raise NotImplementedError("Please Implement this method")
 
     def market_sell_everything(self):
-        res = {}
+        res = []
         for coin, num in self.coins.items():
             if coin not in self.dontTouch:
-                self.market_sell(coin, 'BTC', num / 10)
+                response = self.market_sell_all(coin)
+                res.append(response)
+                print (response)
+        return res
 
 
 
