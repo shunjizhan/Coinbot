@@ -44,7 +44,7 @@ class Bittrex(Exchange):
         else:
             return 0
 
-    def get_coin_balance(self):
+    def get_full_balance(self):
         balances = self.api.get_balances()
         BTC_price = self.get_BTC_price()
 
@@ -69,6 +69,18 @@ class Bittrex(Exchange):
             }
             coins['total']['BTC'] += BTC_value
             coins['total']['USD'] += USD_value
+        return coins
+
+    def get_coin_balance(self, allow_zero):
+        balances = self.api.get_balances()
+        coins = {}
+        for coin in balances['result']:
+            coinName = coin['Currency']
+            num = coin['Balance']
+            if coinName == 'USDT':
+                coinName = 'USD'
+            if allow_zero or num > 0:
+                coins[coinName] = num
         return coins
 
     def get_trading_pairs(self):

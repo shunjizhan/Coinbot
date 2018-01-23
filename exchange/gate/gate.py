@@ -22,7 +22,7 @@ class Gate(Exchange):
         ticker = self.api.ticker(pair)[TYPES[_type]]
         return float(ticker) if ticker else 0
 
-    def get_coin_balance(self):
+    def get_full_balance(self):
         balances = json.loads(self.api.balances())['available']
         ETH_price = float(self.api.ticker('eth_usdt')['last'])
         BTC_price = float(self.api.ticker('btc_usdt')['last'])
@@ -51,6 +51,17 @@ class Gate(Exchange):
             }
             coins['total']['BTC'] += BTC_value
             coins['total']['USD'] += USD_value
+        return coins
+
+    def get_coin_balance(self, allow_zero):
+        balances = json.loads(self.api.balances())['available']
+        coins = {}
+        for coinName in balances:
+            num = float(balances[coinName])
+            if coinName == 'USDT':
+                coinName = 'USD'
+            if allow_zero or num > 0:
+                coins[coinName] = num
         return coins
 
     def get_trading_pairs(self):

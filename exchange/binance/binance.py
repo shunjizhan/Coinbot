@@ -35,7 +35,7 @@ class Binance(Exchange):
         else:
             return 0
 
-    def get_coin_balance(self):
+    def get_full_balance(self):
         balances = self.api.get_account()['balances']
         BTC_price = self.get_BTC_price()
 
@@ -62,6 +62,18 @@ class Binance(Exchange):
             coins['total']['USD'] += USD_value
         return coins
 
+    def get_coin_balance(self, allow_zero):
+        balances = self.api.get_account()['balances']
+        coins = {}
+        for coin in balances:
+            coinName = coin['asset']
+            num = float(coin['free']) + float(coin['locked'])
+            if coinName == 'USDT':
+                coinName = 'USD'
+            if allow_zero or num > 0:
+                coins[coinName] = num
+        return coins
+
     def get_trading_pairs(self):
         markets = {}
         for base in self.market_bases:
@@ -73,10 +85,12 @@ class Binance(Exchange):
         return markets
 
     def market_buy(self, coin, base='BTC', quantity=0):
-        pass
+        pair = self.get_pair(coin, base)
+        self.api.order_market_buy(pair, quantity)
 
     def market_sell(self, coin, base='BTC', quantity=0):
-        pass
+        pair = self.get_pair(coin, base)
+        self.api.order_market_sell(pair, quantity)
 
 
 # ------------------------------------------------------------------ #

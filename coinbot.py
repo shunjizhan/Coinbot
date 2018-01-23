@@ -12,9 +12,7 @@ from exchange.dew.dew import Dew
 class Coinbot:
     def __init__(self):
         self.connect_exchanges()
-        # BTC_price might need to keep updating if the program keep running
         self.BTC_price = self.coinbase.get_BTC_price()
-        self.dontTouch = {'XRP', 'XEM', 'BTC', 'DOGE', 'SC', 'NEO', 'ZEC', 'BTG', 'MONA', 'WINGS', 'USDT', 'IOTA', 'EOS', 'QTUM', 'ADA', 'XLM', 'LSK', 'BTS', 'XMR', 'DASH', 'SNT', 'BCC', 'BCH', 'SBTC', 'BCX', 'ETF', 'LTC', 'ETH'}
 
     def connect_exchanges(self):
         with open('./keys.json') as key_file:
@@ -119,7 +117,7 @@ class Coinbot:
                 )
                 print('{:s}-{:s} {:.1f}% {:.1f}% {:s} > {:s}'.format(coin, base, diff * 100, real_diff * 100, ex_high, ex_low))
 
-    def get_all_coins(self, full=False):
+    def get_full_balance(self, full=False):
         USD_out = 2000 + 8888 + 8338
         all_coins = {
             'total': {
@@ -130,7 +128,7 @@ class Coinbot:
         }
 
         for ex_name, exchange in self.all_exchanges.items():
-            coins = exchange.get_coin_balance()
+            coins = exchange.get_full_balance()
             combine_coins(all_coins, coins)
             p(ex_name + ': '),
             show_coins(coins)
@@ -140,9 +138,17 @@ class Coinbot:
         p('Total:   '),
         show_coins(all_coins, full=full, USD_out=USD_out)
 
+    def get_coin_balance(self, allow_zero=False):
+        pp.pprint(self.all_exchanges)
+        for ex_name, exchange in self.all_exchanges.items():
+            coins = exchange.get_coin_balance(allow_zero)
+            print('--------------------------')
+            print(ex_name)
+            print(coins)
+
     def get_bittrex_profit_ratio(self, base=200):
         # *** not updated ***
-        coins = self.bittrex.get_coin_balance()
+        coins = self.bittrex.get_full_balance()
         for coin, count in coins.items():
             ticker = self.bittrex.get_ticker('BTC-' + coin)['result']
             percent_sum, coin_count = 0.0, 0
@@ -235,7 +241,7 @@ class Coinbot:
     def sell_all_binance(self):
         # *** not updated ***
         dontTouch = self.dontTouch
-        all_coins = self.binance.get_coin_balance()
+        all_coins = self.binance.get_full_balance()
 
         for coinName, quantity in all_coins.items():
             if coinName not in dontTouch:

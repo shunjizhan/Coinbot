@@ -12,7 +12,7 @@ class Dew(Exchange):
     def get_price(self, coin, base='BTC'):
         return self.api.get_price(coin, base)
 
-    def get_coin_balance(self):
+    def get_full_balance(self):
         balances = {
             'DEW': 5505,
         }
