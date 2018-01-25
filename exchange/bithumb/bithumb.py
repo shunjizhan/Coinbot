@@ -8,29 +8,25 @@ from utils import get_rate
 
 class Bithumb(Exchange):
     def __init__(self, key, secret):
-        self.all_coins = {'BTC', 'ETH', 'DASH', 'LTC', 'ETC', 'XRP', 'BCH', 'XMR', 'ZEC', 'QTUM', 'BTG', 'EOS'}
+        self.base_coins = {'BTC', 'ETH', 'DASH', 'LTC', 'ETC', 'XRP', 'BCH', 'XMR', 'ZEC', 'QTUM', 'BTG', 'EOS'}
         self.api = BithumbAPI(key, secret)
         super().__init__('bithumb')
         self.connect_success()
         self.KRW_USD_rate = get_rate('KRW', 'USD')
         self.cmk = Cmk()
 
-    def get_pair(self, coin, base):
-        # return the specific pair format for this exchange
-        pass
-
     def get_BTC_price(self):
         return self.cmk.get_BTC_price()
 
     def get_price(self, coin, base='BTC', _type=0):
         TYPES = {0: 'sell_price', 1: 'buy_price'}
-        if coin not in self.all_coins or base not in self.all_coins:
+        if coin not in self.base_coins or base not in self.base_coins:
             raise Exception('%s doesnt have this pair!' % self.name)
         coin_price = float(self.api.get_ticker(coin)['data'][TYPES[_type]])
         base_price = float(self.api.get_ticker(base)['data'][TYPES[_type]])
         return coin_price / base_price
 
-    def get_full_balance(self):
+    def get_full_balance(self, allow_zero=False):
         '''
         return format {
             'total': {
@@ -44,25 +40,41 @@ class Bithumb(Exchange):
             ...
         }
         '''
-        pass
+        BTC_price = self.get_BTC_price()
+        coins = {
+            'total': {'BTC': 0, 'USD': 0, 'num': 0},
+            'USD': {'BTC': 0, 'USD': 0, 'num': 0}
+        }
+        for coinName, num in self.coins.items():
+            if allow_zero or num > 0:
+                BTC_value = self.get_price(coinName) * num
+                USD_value = BTC_value * BTC_price
+
+                # update info
+                coins[coinName] = {
+                    'num': num,
+                    'BTC': BTC_value,
+                    'USD': USD_value
+                }
+                coins['total']['BTC'] += BTC_value
+                coins['total']['USD'] += USD_value
+        return coins
 
     def get_all_coin_balance(self, allow_zero=False):
         res = {}
-        for coin in self.all_coins:
+        for coin in self.base_coins:
             num = self.api.get_balance(coin)['data']['total_' + coin.lower()]
-            res[coin] = num
+            res[coin] = float(num)
         return res
 
     def get_trading_pairs(self):
-        '''
-        return format: {
-            'BTC': {'ADA', 'BAT', 'BTG', ...},
-            'ETH': {'BAT', 'BNT', 'DNT', 'ETC', ...},
-            'USDT': {'NEO', 'BTC', 'LTC', ...}
-            ...
-        }
-        '''
-        pass
+        markets = {}
+        for base in self.base_coins:
+            markets[base] = set()
+            for coin in self.base_coins:
+                if coin != base:
+                    markets[base].add(coin)
+        return markets
 
     def get_order(self, id):
         pass

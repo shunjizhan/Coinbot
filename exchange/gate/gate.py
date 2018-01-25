@@ -22,7 +22,7 @@ class Gate(Exchange):
         ticker = self.api.ticker(pair)[TYPES[_type]]
         return float(ticker) if ticker else 0
 
-    def get_full_balance(self):
+    def get_full_balance(self, allow_zero=False):
         balances = json.loads(self.api.balances())['available']
         ETH_price = float(self.api.ticker('eth_usdt')['last'])
         BTC_price = float(self.api.ticker('btc_usdt')['last'])
@@ -30,27 +30,28 @@ class Gate(Exchange):
         coins = {'total': {'BTC': 0, 'USD': 0, 'num': 0}}
         for coinName in balances:
             num = float(balances[coinName])
-            if coinName == 'USDT':
-                coinName = 'USD'
-                USD_value = num
-            elif coinName == 'BTC':
-                USD_value = num / BTC_price
-            elif coinName in {'FIL', 'ETH'}:
-                USD_value = num * float(self.api.ticker('FIL_usdt')['last'])
-            else:
-                pair = '%s_eth' % coinName
-                price_in_USD = float(self.api.ticker(pair)['last']) * ETH_price
-                USD_value = price_in_USD * num
-            BTC_value = USD_value / BTC_price
+            if allow_zero or num > 0:
+                if coinName == 'USDT':
+                    coinName = 'USD'
+                    USD_value = num
+                elif coinName == 'BTC':
+                    USD_value = num / BTC_price
+                elif coinName in {'FIL', 'ETH'}:
+                    USD_value = num * float(self.api.ticker('FIL_usdt')['last'])
+                else:
+                    pair = '%s_eth' % coinName
+                    price_in_USD = float(self.api.ticker(pair)['last']) * ETH_price
+                    USD_value = price_in_USD * num
+                BTC_value = USD_value / BTC_price
 
-            # update info
-            coins[coinName] = {
-                'num': num,
-                'BTC': BTC_value,
-                'USD': USD_value
-            }
-            coins['total']['BTC'] += BTC_value
-            coins['total']['USD'] += USD_value
+                # update info
+                coins[coinName] = {
+                    'num': num,
+                    'BTC': BTC_value,
+                    'USD': USD_value
+                }
+                coins['total']['BTC'] += BTC_value
+                coins['total']['USD'] += USD_value
         return coins
 
     def get_all_coin_balance(self, allow_zero=False):

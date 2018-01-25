@@ -46,7 +46,7 @@ class Bittrex(Exchange):
     def get_order(self, id):
         return self.api.get_order(id)
 
-    def get_full_balance(self):
+    def get_full_balance(self, allow_zero=False):
         balances = self.api.get_balances()
         BTC_price = self.get_BTC_price()
 
@@ -54,23 +54,24 @@ class Bittrex(Exchange):
         for coin in balances['result']:
             coinName = coin['Currency']
             num = coin['Balance']
-            if coinName == 'USDT':
-                coinName = 'USD'
-                BTC_value = num / BTC_price
-            elif coinName == 'BTC':
-                BTC_value = num
-            else:
-                BTC_value = self.get_price(coinName) * num
-            USD_value = BTC_value * BTC_price
+            if allow_zero or num > 0:
+                if coinName == 'USDT':
+                    coinName = 'USD'
+                    BTC_value = num / BTC_price
+                elif coinName == 'BTC':
+                    BTC_value = num
+                else:
+                    BTC_value = self.get_price(coinName) * num
+                USD_value = BTC_value * BTC_price
 
-            # update info
-            coins[coinName] = {
-                'num': num,
-                'BTC': BTC_value,
-                'USD': USD_value
-            }
-            coins['total']['BTC'] += BTC_value
-            coins['total']['USD'] += USD_value
+                # update info
+                coins[coinName] = {
+                    'num': num,
+                    'BTC': BTC_value,
+                    'USD': USD_value
+                }
+                coins['total']['BTC'] += BTC_value
+                coins['total']['USD'] += USD_value
         return coins
 
     def get_all_coin_balance(self, allow_zero=False):

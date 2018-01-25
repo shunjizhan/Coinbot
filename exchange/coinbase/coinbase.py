@@ -32,7 +32,7 @@ class Coinbase(Exchange):
         api_url = self.api_base_url + 'products/%s/book?level=1' % pair
         return float(requests.get(api_url, auth=self.auth).json()[TYPES[_type]][0][0])
 
-    def get_full_balance(self):
+    def get_full_balance(self, allow_zero=False):
         account = requests.get(self.api_base_url + 'accounts', auth=self.auth).json()
 
         BTC_price = self.get_BTC_price()
@@ -40,20 +40,21 @@ class Coinbase(Exchange):
         for acc in account:
             coinName = acc['currency']
             num = float(acc['balance'])
-            if coinName == 'USD':
-                USD_value = num
-            else:
-                USD_value = self.get_price(coinName, base='USD') * num
-            BTC_value = USD_value / BTC_price
+            if allow_zero or num > 0:
+                if coinName == 'USD':
+                    USD_value = num
+                else:
+                    USD_value = self.get_price(coinName, base='USD') * num
+                BTC_value = USD_value / BTC_price
 
-            # update info
-            coins[coinName] = {
-                'num': num,
-                'BTC': BTC_value,
-                'USD': USD_value
-            }
-            coins['total']['BTC'] += BTC_value
-            coins['total']['USD'] += USD_value
+                # update info
+                coins[coinName] = {
+                    'num': num,
+                    'BTC': BTC_value,
+                    'USD': USD_value
+                }
+                coins['total']['BTC'] += BTC_value
+                coins['total']['USD'] += USD_value
         return coins
 
     def get_all_coin_balance(self, allow_zero=False):

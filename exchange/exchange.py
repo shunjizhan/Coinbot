@@ -22,7 +22,7 @@ class Exchange:
     def get_price(self, coin, base='BTC'):
         raise NotImplementedError("Please Implement this method")
 
-    def get_full_balance(self):
+    def get_full_balance(self, allow_zero=False):
         '''
         return format {
             'total': {

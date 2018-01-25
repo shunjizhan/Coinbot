@@ -25,47 +25,47 @@ class Coinbot:
 
         print('')
 
+        self.gate = Gate(
+            key_gate['key'],
+            key_gate['secret'],
+        )
+
+        self.coinbase = Coinbase(
+            key_coinbase['key'],
+            key_coinbase['secret'],
+            key_coinbase['pass']
+        )
+
+        self.bittrex = Bittrex(
+            key_bittrex['key'],
+            key_bittrex['secret']
+        )
+
+        self.binance = Binance(
+            key_binance['key'],
+            key_binance['secret']
+        )
+
         self.bithumb = Bithumb(
             key_bithumb['key'],
             key_bithumb['secret'],
         )
 
-        # self.gate = Gate(
-        #     key_gate['key'],
-        #     key_gate['secret'],
-        # )
-
-        # self.coinbase = Coinbase(
-        #     key_coinbase['key'],
-        #     key_coinbase['secret'],
-        #     key_coinbase['pass']
-        # )
-
-        # self.bittrex = Bittrex(
-        #     key_bittrex['key'],
-        #     key_bittrex['secret']
-        # )
-
-        # self.binance = Binance(
-        #     key_binance['key'],
-        #     key_binance['secret']
-        # )
-
-        # self.dew = Dew()
+        self.dew = Dew()
 
         self.all_exchanges = {
-            # 'gate': self.gate,
-            # 'dew': self.dew,
-            # 'coinbase': self.coinbase,
-            # 'binance': self.binance,
-            # 'bittrex': self.bittrex,
+            'gate': self.gate,
+            'dew': self.dew,
+            'coinbase': self.coinbase,
+            'binance': self.binance,
+            'bittrex': self.bittrex,
             'bithumb': self.bithumb,
         }
 
         self.trading_exchanges = {
-            # 'gate': self.gate,
-            # 'binance': self.binance,
-            # 'bittrex': self.bittrex,
+            'gate': self.gate,
+            'binance': self.binance,
+            'bittrex': self.bittrex,
             'bithumb': self.bithumb,
         }
 
@@ -125,7 +125,7 @@ class Coinbot:
                 )
                 print('{:s}-{:s} {:.1f}% {:.1f}% {:s} > {:s}'.format(coin, base, diff * 100, real_diff * 100, ex_high, ex_low))
 
-    def get_full_balance(self, full=False):
+    def get_full_balance(self, full=False, allow_zero=False):
         BTC_price = self.coinbase.get_BTC_price()
         USD_out = 2000 + 8888 + 8338
         all_coins = {
@@ -137,7 +137,7 @@ class Coinbot:
         }
 
         for ex_name, exchange in self.all_exchanges.items():
-            coins = exchange.get_full_balance()
+            coins = exchange.get_full_balance(allow_zero=allow_zero)
             combine_coins(all_coins, coins)
             p(ex_name + ': '),
             show_coins(coins)
