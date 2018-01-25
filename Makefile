@@ -13,3 +13,6 @@ diff:
 test:
 	python3 main.py test
 
+install:
+	pip3 install -r requirements.txt 
+

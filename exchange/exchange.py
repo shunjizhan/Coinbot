@@ -65,8 +65,24 @@ class Exchange:
         else:
             return 0
 
+    def get_order(self, id):
+        raise NotImplementedError("Please Implement this method")
+
     # ----------- might need to update self.coins after buy/sell ----------- #
     def market_buy(self, coin, base='BTC', quantity=0):
+        '''
+        return format {
+            'exchange': [exchange name],
+            'side': [buy or sell],
+            'pair': [coin-base],
+            'price': [average filled price],
+            'quantity': [filled quantity],
+            'total': [total order value in BTC],
+            'fee': [fee in BTC],
+            'id': order id,
+            'id2': customed order id
+        }
+        '''
         raise NotImplementedError("Please Implement this method")
 
     def market_sell(self, coin, base='BTC', quantity=0):

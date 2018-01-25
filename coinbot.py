@@ -7,6 +7,7 @@ from exchange.coinbase.coinbase import Coinbase
 from exchange.binance.binance import Binance
 from exchange.gate.gate import Gate
 from exchange.dew.dew import Dew
+from exchange.bithumb.bithumb import Bithumb
 
 
 class Coinbot:
@@ -21,13 +22,19 @@ class Coinbot:
         key_bittrex = keys['bittrex']
         key_binance = keys['binance']
         key_gate = keys['gate']
+        key_bithumb = keys['bithumb']
 
         print('')
 
-        self.gate = Gate(
-            key_gate['key'],
-            key_gate['secret'],
+        self.bithumb = Bithumb(
+            key_bithumb['key'],
+            key_bithumb['secret'],
         )
+
+        # self.gate = Gate(
+        #     key_gate['key'],
+        #     key_gate['secret'],
+        # )
 
         self.coinbase = Coinbase(
             key_coinbase['key'],
@@ -35,30 +42,32 @@ class Coinbot:
             key_coinbase['pass']
         )
 
-        self.bittrex = Bittrex(
-            key_bittrex['key'],
-            key_bittrex['secret']
-        )
+        # self.bittrex = Bittrex(
+        #     key_bittrex['key'],
+        #     key_bittrex['secret']
+        # )
 
-        self.binance = Binance(
-            key_binance['key'],
-            key_binance['secret']
-        )
+        # self.binance = Binance(
+        #     key_binance['key'],
+        #     key_binance['secret']
+        # )
 
-        self.dew = Dew()
+        # self.dew = Dew()
 
         self.all_exchanges = {
-            'gate': self.gate,
-            'dew': self.dew,
+            # 'gate': self.gate,
+            # 'dew': self.dew,
             'coinbase': self.coinbase,
-            'binance': self.binance,
-            'bittrex': self.bittrex,
+            # 'binance': self.binance,
+            # 'bittrex': self.bittrex,
+            'bithumb': self.bithumb,
         }
 
         self.trading_exchanges = {
-            'gate': self.gate,
-            'binance': self.binance,
-            'bittrex': self.bittrex,
+            # 'gate': self.gate,
+            # 'binance': self.binance,
+            # 'bittrex': self.bittrex,
+            'bithumb': self.bithumb,
         }
 
         print('')
@@ -212,61 +221,5 @@ class Coinbot:
                         print('%.2f' % percent)
                         # break
         print(total, total / count)
-
-    def buy_all_binance(self, USD_total=200.0):
-        # *** not updated ***
-        dontTouch = self.dontTouch
-        balances = self.binance.client.get_account()['balances']
-
-        # pp.pprint(balances)
-        for coin in balances:
-            coinName = coin['asset']
-            if coinName not in dontTouch:
-                num = float(coin['free']) + float(coin['locked'])
-                if num == 0:
-                    pair = coinName + 'BTC'
-                    print(coinName),
-                    info = self.binance.client.get_symbol_info(pair)
-                    if info:
-                        # print info
-                        ticker = self.binance.client.get_order_book(symbol=pair)
-                        if (ticker is not None and ticker['asks']):
-                            # print ticker['asks']
-                            price = float(ticker['asks'][0][0]) * 1.03
-                            BTC_total = USD_total / self.BTC_price * 1.03
-                            quantity = int(BTC_total / price)
-                            print(price, quantity)
-                            result = self.binance.client.order_market_buy(symbol=pair, quantity=quantity)
-
-    def sell_all_binance(self):
-        # *** not updated ***
-        dontTouch = self.dontTouch
-        all_coins = self.binance.get_full_balance()
-
-        for coinName, quantity in all_coins.items():
-            if coinName not in dontTouch:
-                pair = coinName + 'BTC'
-                price = float(self.binance.client.get_order_book(symbol=pair)['bids'][0][0])
-                BTC_value = price * quantity
-                extra_value = BTC_value - 0.01190112    # 200 USD
-                sell_quantity = int(extra_value / price)
-                if sell_quantity > 0:
-                    print(coinName, sell_quantity)
-                    result = self.binance.client.order_market_sell(symbol=pair, quantity=sell_quantity)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

@@ -19,9 +19,8 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'coins':
         bot.get_all_coin_balance()
     elif sys.argv[1] == 'test':
-        # p(bot.binance.api.get_order_book(symbol='NEOUSDT'))
-        # p(bot.bittrex.api.get_orderbook('USDT-NEO', 'both', 3)['result'])
-        res = bot.binance.market_sell_all()
-        p(res)
+        # res = bot.bittrex.market_sell_everything()
+        # p(res)
+        print (bot.bithumb.api.get_wallet_address())
     else:
         print('nothing to do...')

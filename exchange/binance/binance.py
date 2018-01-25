@@ -100,6 +100,8 @@ class Binance(Exchange):
             'pair': self.get_my_pair(coin, base),
             'price': response['price'],
             'quantity': response['executedQty'],
+            'total': None,
+            'fee': None,
             'id': response['orderId'],
             'id2': response['clientOrderId']
         }
@@ -113,6 +115,8 @@ class Binance(Exchange):
             'pair': self.get_my_pair(coin, base),
             'price': response['price'],
             'quantity': response['executedQty'],
+            'total': None,
+            'fee': None,
             'id': response['orderId'],
             'id2': response['clientOrderId']
         }
