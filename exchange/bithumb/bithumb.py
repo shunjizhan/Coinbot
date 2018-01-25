@@ -68,8 +68,8 @@ class Bithumb(Exchange):
         return res
 
     def get_trading_pairs(self):
-        markets = {}
-        for base in self.base_coins:
+        markets = {'USDT': set()}
+        for base in {'BTC', 'ETH'}:
             markets[base] = set()
             for coin in self.base_coins:
                 if coin != base:

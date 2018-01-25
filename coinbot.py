@@ -109,12 +109,6 @@ class Coinbot:
             bid = self.trading_exchanges[ex_high].get_price(coin, base, 0)
             ask = self.trading_exchanges[ex_low].get_price(coin, base, 1)
             real_diff = (bid - ask) / bid
-            # if real_diff < 0:
-            #     bid = self.trading_exchanges[ex_low].get_price(coin, base, 0)
-            #     ask = self.trading_exchanges[ex_high].get_price(coin, base, 1)
-            #     real_diff = (bid - ask) / bid
-
-            # need more accurate diff calculation with market depth
             if real_diff >= min_diff:
                 print('')
                 print(
