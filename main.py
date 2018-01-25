@@ -21,6 +21,17 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'test':
         # res = bot.bittrex.market_sell_everything()
         # p(res)
-        print (bot.bithumb.api.get_wallet_address())
+        # print (bot.bithumb.api.place_market_sell(0.01, 'ETH'))
+        # print(bot.bithumb.get_price('BTC'))
+        # print(bot.bithumb.get_price('ETH'))
+        # print(bot.bithumb.get_price('BTC', 'ETH'))
+        print(bot.bithumb.get_price('QTUM', 'EOS'))
+        # print (bot.bithumb.api.get_ticker())
+        # print (bot.bithumb.api.get_order_book())
+        # print (bot.bithumb.api.get_recent_transactions())
+        # print (bot.bithumb.api.get_account())
+        # print (bot.bithumb.api.get_my_ticker())
+        # # print (bot.bithumb.api.get_my_orders())
+        # print (bot.bithumb.api.get_my_transactions())
     else:
         print('nothing to do...')

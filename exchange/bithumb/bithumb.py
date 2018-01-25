@@ -1,31 +1,34 @@
-# from datetime import datetime
+from datetime import datetime
 
 from .xcoin_api_client import XCoinAPI
 from ..exchange import Exchange
+from ..dew.dew import Cmk
+from utils import get_rate
 
 
 class Bithumb(Exchange):
     def __init__(self, key, secret):
+        self.all_coins = {'BTC', 'ETH', 'DASH', 'LTC', 'ETC', 'XRP', 'BCH', 'XMR', 'ZEC', 'QTUM', 'BTG', 'EOS'}
         self.api = BithumbAPI(key, secret)
         super().__init__('bithumb')
         self.connect_success()
-
-    def connect_success(self):
-        print('connected %s' % self.name)
+        self.KRW_USD_rate = get_rate('KRW', 'USD')
+        self.cmk = Cmk()
 
     def get_pair(self, coin, base):
         # return the specific pair format for this exchange
-        raise NotImplementedError("Please Implement this method")
-
-    def get_my_pair(self, coin, base):
-        # return my format
-        return '%s-%s' % (coin, base)
+        pass
 
     def get_BTC_price(self):
-        raise NotImplementedError("Please Implement this method")
+        return self.cmk.get_BTC_price()
 
-    def get_price(self, coin, base='BTC'):
-        raise NotImplementedError("Please Implement this method")
+    def get_price(self, coin, base='BTC', _type=0):
+        TYPES = {0: 'sell_price', 1: 'buy_price'}
+        if coin not in self.all_coins or base not in self.all_coins:
+            raise Exception('%s doesnt have this pair!' % self.name)
+        coin_price = float(self.api.get_ticker(coin)['data'][TYPES[_type]])
+        base_price = float(self.api.get_ticker(base)['data'][TYPES[_type]])
+        return coin_price / base_price
 
     def get_full_balance(self):
         '''
@@ -41,10 +44,14 @@ class Bithumb(Exchange):
             ...
         }
         '''
-        raise NotImplementedError("Please Implement this method")
+        pass
 
     def get_all_coin_balance(self, allow_zero=False):
-        return self.api.get_account()
+        res = {}
+        for coin in self.all_coins:
+            num = self.api.get_balance(coin)['data']['total_' + coin.lower()]
+            res[coin] = num
+        return res
 
     def get_trading_pairs(self):
         '''
@@ -55,10 +62,10 @@ class Bithumb(Exchange):
             ...
         }
         '''
-        raise NotImplementedError("Please Implement this method")
+        pass
 
     def get_order(self, id):
-        raise NotImplementedError("Please Implement this method")
+        pass
 
     def market_buy(self, coin, base='BTC', quantity=0):
         '''
@@ -74,13 +81,13 @@ class Bithumb(Exchange):
             'id2': customed order id
         }
         '''
-        raise NotImplementedError("Please Implement this method")
+        pass
 
     def market_sell(self, coin, base='BTC', quantity=0):
-        raise NotImplementedError("Please Implement this method")
+        pass
 
     def market_buy_everything(self, USD_price):
-        raise NotImplementedError("Please Implement this method")
+        pass
 
 
 # ------------------------------------------------------------------ #
@@ -90,7 +97,7 @@ class BithumbAPI(XCoinAPI):
     def __init__(self, api_key='', api_secret=''):
         super().__init__(api_key, api_secret)
 
-    # public api
+    #public api
     def get_ticker(self, currency="BTC"):
         """
         get information of last transaction
@@ -106,7 +113,7 @@ class BithumbAPI(XCoinAPI):
         result = self.publicCall(url)
         return result
 
-    # public api
+    #public api
     def get_order_book(self, currency="BTC", count=5):
         """
         get order book
@@ -128,7 +135,7 @@ class BithumbAPI(XCoinAPI):
         result = self.publicCall(url, params=params)
         return result
 
-    # public api
+    #public api
     def get_recent_transactions(self, offset = 0, currency="BTC", count=20):
         """
         get recent transcations
@@ -153,7 +160,7 @@ class BithumbAPI(XCoinAPI):
         result = self.publicCall(url, params=params)
         return result
 
-    # private api
+    #private api
     def get_account(self, currency='BTC'):
         """
         get account info
@@ -167,15 +174,15 @@ class BithumbAPI(XCoinAPI):
         """
         url = "/info/account"
 
-        rgParams = {
+        p_params = {
             'currency': currency
         }
 
-        result = self.xcoinApiCall(url, rgParams=rgParams)
+        result = self.xcoinApiCall(url, p_params=p_params)
         return result
 
-    # private api
-    def get_balance(self, currency='ALL'):
+    #private api
+    def get_balance(self, currency='all'):
         """
         get balance info
         지갑 정보
@@ -188,14 +195,14 @@ class BithumbAPI(XCoinAPI):
         """
         url = "/info/balance"
 
-        rgParams = {
+        p_params = {
             'currency': currency
         }
 
-        result = self.xcoinApiCall(url, rgParams=rgParams)
+        result = self.xcoinApiCall(url, p_params=p_params)
         return result
 
-    # private api
+    #private api
     def get_wallet_address(self, currency='BTC'):
         """
         get wallet_address
@@ -209,14 +216,15 @@ class BithumbAPI(XCoinAPI):
         """
         url = "/info/wallet_address"
 
-        rgParams = {
+        p_params = {
             'currency': currency
         }
 
-        result = self.xcoinApiCall(url, rgParams=rgParams)
+        result = self.xcoinApiCall(url, p_params=p_params)
         return result
 
-    # private api
+
+    #private api
     def get_my_ticker(self, order_currency='BTC', payment_currency='KRW'):
         """
         get my ticker
@@ -233,15 +241,15 @@ class BithumbAPI(XCoinAPI):
         """
         url = "/info/ticker"
 
-        rgParams = {
+        p_params = {
             'order_currency': order_currency,
             'payment_currency': payment_currency
         }
 
-        result = self.xcoinApiCall(url, rgParams=rgParams)
+        result = self.xcoinApiCall(url, p_params=p_params)
         return result
 
-    # private
+    #private
     def get_my_orders(self, type, count=100, after='2014-11-28 16:40:01', currency='BTC', order_id=None):
         """
         get my orders info
@@ -265,7 +273,7 @@ class BithumbAPI(XCoinAPI):
 
         after_unix = int(after.timestamp()) * 1000
 
-        rgParams = {
+        p_params = {
             'type': type,
             'count': count,
             'after': after_unix,
@@ -274,12 +282,12 @@ class BithumbAPI(XCoinAPI):
         }
 
         try:
-            result = self.xcoinApiCall(url, rgParams=rgParams)
+            result = self.xcoinApiCall(url, p_params=p_params)
         except KeyError:
             return None
         return result
 
-    # private
+    #private
     def get_my_transactions(self, offset=0, count=20, searchGb=0, currency='BTC'):
         """
         get info about my transactions
@@ -297,17 +305,17 @@ class BithumbAPI(XCoinAPI):
         """
         url = "/info/user_transactions"
 
-        rgParams = {
-            'offset': offest,
+        p_params = {
+            'offset': offset,
             'count': count,
             'searchGb': searchGb,
             'currency': currency
         }
 
-        result = self.xcoinApiCall(url, rgParams=rgParams)
+        result = self.xcoinApiCall(url, p_params=p_params)
         return result
 
-    # private
+    #private
     def place_limit_order(self, type, order_currency, price, units, payment_currency='KRW'):
         """
         place limit order
@@ -326,7 +334,7 @@ class BithumbAPI(XCoinAPI):
         """
         url = "/trade/place"
 
-        rgParams = {
+        p_params = {
             'type': type,
             'order_currency': order_currency,
             'price': price,
@@ -334,10 +342,10 @@ class BithumbAPI(XCoinAPI):
             'payment_currency': payment_currency
         }
 
-        result = self.xcoinApiCall(url, rgParams=rgParams)
+        result = self.xcoinApiCall(url, p_params=p_params)
         return result
 
-    # private
+    #private
     def get_order_detail(self, type, order_id = None, currency='BTC'):
         """
         get order detail
@@ -353,16 +361,16 @@ class BithumbAPI(XCoinAPI):
         """
         url = "/info/order_detail"
 
-        rgParams = {
+        p_params = {
             'type': type,
             'order_id': order_id,
             'currency': currency
         }
 
-        result = self.xcoinApiCall(url, rgParams=rgParams)
+        result = self.xcoinApiCall(url, p_params=p_params)
         return result
 
-    # private
+    #private
     def cancel_order(self, type, order_id, currency='BTC'):
         """
         cancel order
@@ -376,16 +384,16 @@ class BithumbAPI(XCoinAPI):
         """
         url = "/trade/cancel"
 
-        rgParams = {
+        p_params = {
             'type': type,
             'order_id': order_id,
             'currency': currency
         }
 
-        result = self.xcoinApiCall(url, rgParams=rgParams)
+        result = self.xcoinApiCall(url, p_params=p_params)
         return result
 
-    # private
+    #private
     def withdraw_currecny(self, units, address, destination, currency='BTC'):
         """
         withdraw currency
@@ -398,14 +406,14 @@ class BithumbAPI(XCoinAPI):
         """
         url = "/trade/btc_withdrawal"
 
-        rgParams = {
+        p_params = {
             'units': units,
             'address': address,
             'destination': destination,
             'currency': currency
         }
 
-        result = self.xcoinApiCall(url, rgParams=rgParams)
+        result = self.xcoinApiCall(url, p_params=p_params)
         return result
 
     def get_krw_deposit(self):
@@ -429,12 +437,12 @@ class BithumbAPI(XCoinAPI):
         """
         url = "/trade/market_buy"
 
-        rgParams = {
+        p_params = {
             'units': units,
             'currency': currency
         }
 
-        result = self.xcoinApiCall(url, rgParams=rgParams)
+        result = self.xcoinApiCall(url, p_params=p_params)
         return result
 
     def place_market_sell(self, units, currency):
@@ -448,10 +456,10 @@ class BithumbAPI(XCoinAPI):
         """
         url = "/trade/market_sell"
 
-        rgParams = {
+        p_params = {
             'units': units,
             'currency': currency
         }
 
-        result = self.xcoinApiCall(url, rgParams=rgParams)
+        result = self.xcoinApiCall(url, p_params=p_params)
         return result

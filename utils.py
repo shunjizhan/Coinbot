@@ -1,4 +1,5 @@
 import sys
+import requests
 
 
 def p(*args):
@@ -36,7 +37,7 @@ def show_coins(coins, full=False, USD_out=0):
     else:
         p(coins['total']['USD'])
 
-    # 算仓位
+    # cang wei
     cash_ratio = round(coins['USD']['USD'] * 100.0 / (coins['total']['USD'] - USD_out), 1)
     coin_ratio = str(100 - cash_ratio)
     print(coin_ratio + '%')
@@ -80,3 +81,64 @@ def combine_markets(m1, m2):
     for base in m2:
         m1[base] &= m2[base]
     return m1
+
+
+def get_rate(currency, base):
+    url = 'https://api.fixer.io/latest?base=%s' % base
+    return requests.get(url).json()['rates'][currency]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -13,7 +13,6 @@ from exchange.bithumb.bithumb import Bithumb
 class Coinbot:
     def __init__(self):
         self.connect_exchanges()
-        self.BTC_price = self.coinbase.get_BTC_price()
 
     def connect_exchanges(self):
         with open('./keys.json') as key_file:
@@ -36,11 +35,11 @@ class Coinbot:
         #     key_gate['secret'],
         # )
 
-        self.coinbase = Coinbase(
-            key_coinbase['key'],
-            key_coinbase['secret'],
-            key_coinbase['pass']
-        )
+        # self.coinbase = Coinbase(
+        #     key_coinbase['key'],
+        #     key_coinbase['secret'],
+        #     key_coinbase['pass']
+        # )
 
         # self.bittrex = Bittrex(
         #     key_bittrex['key'],
@@ -57,7 +56,7 @@ class Coinbot:
         self.all_exchanges = {
             # 'gate': self.gate,
             # 'dew': self.dew,
-            'coinbase': self.coinbase,
+            # 'coinbase': self.coinbase,
             # 'binance': self.binance,
             # 'bittrex': self.bittrex,
             'bithumb': self.bithumb,
@@ -127,10 +126,11 @@ class Coinbot:
                 print('{:s}-{:s} {:.1f}% {:.1f}% {:s} > {:s}'.format(coin, base, diff * 100, real_diff * 100, ex_high, ex_low))
 
     def get_full_balance(self, full=False):
+        BTC_price = self.coinbase.get_BTC_price()
         USD_out = 2000 + 8888 + 8338
         all_coins = {
             'total': {
-                'BTC': USD_out / self.BTC_price,
+                'BTC': USD_out / BTC_price,
                 'USD': USD_out,
                 'num': 0
             }

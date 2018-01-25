@@ -11,6 +11,7 @@ import time
 import math
 import base64
 import hmac, hashlib
+import pprint as pp
 
 PY3 = sys.version_info[0] > 2
 if PY3:
@@ -48,7 +49,7 @@ class XCoinAPI:
 		res = requests.get(url, params = params)
 		return res.json()
 
-	def xcoinApiCall(self, endpoint, rgParams={}, params={}):
+	def xcoinApiCall(self, endpoint, p_params={}, params={}):
 		# 1. Api-Sign and Api-Nonce information generation.
 		# 2. Request related information from the Bithumb API server.
 		#
@@ -57,7 +58,7 @@ class XCoinAPI:
 		"""
 		parameters
 		----------
-		rgParams: dict
+		p_params: dict
 			- parameters used in private api call
 		params: dict
 			- parameters used in public api call
@@ -66,7 +67,7 @@ class XCoinAPI:
 			"endpoint" : endpoint
 		};
 
-		uri_array = dict(endpoint_item_array, **rgParams); # Concatenate the two arrays.
+		uri_array = dict(endpoint_item_array, **p_params); # Concatenate the two arrays.
 
 		if PY3:
 			e_uri_data = urllib.parse.urlencode(uri_array)
@@ -110,4 +111,5 @@ class XCoinAPI:
 		#response_code = curl_handle.getinfo(pycurl.RESPONSE_CODE) # Get http response status code.
 
 		curl_handle.close()
+		# pp.pprint(self.contents)
 		return (json.loads(self.contents))
