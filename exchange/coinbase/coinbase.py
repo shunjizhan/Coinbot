@@ -36,7 +36,10 @@ class Coinbase(Exchange):
         account = requests.get(self.api_base_url + 'accounts', auth=self.auth).json()
 
         BTC_price = self.get_BTC_price()
-        coins = {'total': {'BTC': 0, 'USD': 0, 'num': 0}}
+        coins = {
+            'total': {'BTC': 0, 'USD': 0, 'num': 0},
+            'USD': {'BTC': 0, 'USD': 0, 'num': 0}
+        }
         for acc in account:
             coinName = acc['currency']
             num = float(acc['balance'])

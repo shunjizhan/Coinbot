@@ -27,7 +27,10 @@ class Gate(Exchange):
         ETH_price = float(self.api.ticker('eth_usdt')['last'])
         BTC_price = float(self.api.ticker('btc_usdt')['last'])
 
-        coins = {'total': {'BTC': 0, 'USD': 0, 'num': 0}}
+        coins = {
+            'total': {'BTC': 0, 'USD': 0, 'num': 0},
+            'USD': {'BTC': 0, 'USD': 0, 'num': 0}
+        }
         for coinName in balances:
             num = float(balances[coinName])
             if allow_zero or num > 0:

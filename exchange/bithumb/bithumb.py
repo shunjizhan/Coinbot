@@ -95,11 +95,14 @@ class Bithumb(Exchange):
         '''
         pass
 
-    def market_sell(self, coin, base='BTC', quantity=0):
-        pass
-
-    def market_buy_everything(self, USD_price):
-        pass
+    def market_sell(self, coin, base='KRW', quantity=0):
+        if base != 'KRW':
+            print(base)
+            raise Exception('%s can only do KRW trading!' % self.name)
+        if coin not in self.base_coins:
+            raise Exception('%s doesnt have this coin!' % self.name)
+        res = self.api.market_sell(coin, quantity)
+        return res.json()
 
 
 # ------------------------------------------------------------------ #
@@ -438,7 +441,7 @@ class BithumbAPI(XCoinAPI):
         result = self.xcoinApiCall(url)
         return result
 
-    def place_market_buy(self, units, currency):
+    def market_buy(self, units, currency):
         """
         place market buy
 
@@ -457,7 +460,7 @@ class BithumbAPI(XCoinAPI):
         result = self.xcoinApiCall(url, p_params=p_params)
         return result
 
-    def place_market_sell(self, units, currency):
+    def market_sell(self, units, currency):
         """
         place market sell
 

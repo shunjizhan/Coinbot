@@ -25,41 +25,20 @@ class Coinbot:
 
         print('')
 
-        self.gate = Gate(
-            key_gate['key'],
-            key_gate['secret'],
-        )
-
-        self.coinbase = Coinbase(
-            key_coinbase['key'],
-            key_coinbase['secret'],
-            key_coinbase['pass']
-        )
-
-        self.bittrex = Bittrex(
-            key_bittrex['key'],
-            key_bittrex['secret']
-        )
-
-        self.binance = Binance(
-            key_binance['key'],
-            key_binance['secret']
-        )
-
-        self.bithumb = Bithumb(
-            key_bithumb['key'],
-            key_bithumb['secret'],
-        )
-
+        self.gate = Gate(key_gate['key'], key_gate['secret'])
+        self.coinbase = Coinbase(key_coinbase['key'], key_coinbase['secret'], key_coinbase['pass'])
+        self.bittrex = Bittrex(key_bittrex['key'], key_bittrex['secret'])
+        self.binance = Binance(key_binance['key'], key_binance['secret'])
+        self.bithumb = Bithumb(key_bithumb['key'], key_bithumb['secret'])
         self.dew = Dew()
 
         self.all_exchanges = {
+            'bithumb': self.bithumb,
             'gate': self.gate,
             'dew': self.dew,
             'coinbase': self.coinbase,
             'binance': self.binance,
             'bittrex': self.bittrex,
-            'bithumb': self.bithumb,
         }
 
         self.trading_exchanges = {

@@ -34,7 +34,7 @@ class Dew(Exchange):
         return coins
 
     def get_all_coin_balance(self, allow_zero=False):
-        return {'DEW': 5505}
+        return {'DEW': 2688}
 
 
 # ------------------------------------------------------------------ #

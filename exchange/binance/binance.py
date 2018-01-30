@@ -46,7 +46,10 @@ class Binance(Exchange):
         balances = self.api.get_account()['balances']
         BTC_price = self.get_BTC_price()
 
-        coins = {'total': {'BTC': 0, 'USD': 0, 'num': 0}}
+        coins = {
+            'total': {'BTC': 0, 'USD': 0, 'num': 0},
+            'USD': {'BTC': 0, 'USD': 0, 'num': 0}
+        }
         for coin in balances:
             coinName = coin['asset']
             num = float(coin['free']) + float(coin['locked'])

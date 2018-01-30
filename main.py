@@ -15,7 +15,7 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'full':
         bot.get_full_balance(full=True, allow_zero=False)
     elif sys.argv[1] == 'diff':
-        bot.get_all_diff_rate(min_diff=0.01)
+        bot.get_all_diff_rate(min_diff=0.001)
     elif sys.argv[1] == 'coins':
         bot.get_all_coin_balance()
     elif sys.argv[1] == 'test':
@@ -25,7 +25,7 @@ if __name__ == '__main__':
         # print(bot.bithumb.get_price('BTC'))
         # print(bot.bithumb.get_price('ETH'))
         # print(bot.bithumb.get_price('BTC', 'ETH'))
-        print(bot.bithumb.get_diff_rate())
+        print(bot.gate.api.balances())
         # print (bot.bithumb.api.get_ticker())
         # print (bot.bithumb.api.get_order_book())
         # print (bot.bithumb.api.get_recent_transactions())
