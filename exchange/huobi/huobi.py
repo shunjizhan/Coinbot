@@ -1,75 +1,72 @@
-import time
+import base64
+import datetime
 import hashlib
+import hmac
+import json
+import urllib
+import urllib.parse
+import urllib.request
 import requests
 from collections import defaultdict
 from ..exchange import Exchange
-try:
-    # py3
-    from urllib.parse import urlencode
-except:
-    # py2
-    from urllib import urlencode
-
-try:
-    from json.decoder import JSONDecodeError
-except ImportError:
-    JSONDecodeError = ValueError
 
 
 class Huobi(Exchange):
     def __init__(self, key, secret):
         self.api = HuobiAPI(key, secret)
+        self.all_pairs = self.get_all_trading_pairs()
         super().__init__('huobi')
         self.connect_success()
 
     def get_pair(self, coin, base):
-        # return coin + base
-        pass
+        return (coin + base).lower()
+
+    def get_all_trading_pairs(self):
+        all_pairs = set()
+        res = self.api.get_symbols()['data']
+        for info in res:
+            coin = info['base-currency']
+            base = info['quote-currency']
+            all_pairs.add(self.get_pair(coin, base))
+        return all_pairs
 
     def get_BTC_price(self):
-        # return self.get_price('BTC', base='USDT')
-        pass
+        return self.get_price('BTC', base='USDT')
 
     def get_price(self, coin, base='BTC', _type=0):
-        # TYPES = {0: 'bids', 1: 'asks', 2: 'last'}
-        # pair = self.get_pair(coin, base)
-        # if self.api.get_symbol_info(pair):
-        #     return float(self.api.get_order_book(symbol=pair)[TYPES[_type]][0][0])
-        # else:
-        #     return 0
-        pass
+        TYPES = {0: 'bid', 1: 'ask'}
+        pair = self.get_pair(coin, base)
+        if pair in self.all_pairs:
+            return float(self.api.get_ticker(symbol=pair)['tick'][TYPES[_type]][0])
+        else:
+            return 0
 
     def get_full_balance(self, allow_zero=False):
-        # balances = self.api.get_account()['balances']
-        # BTC_price = self.get_BTC_price()
+        BTC_price = self.get_BTC_price()
+        coins = {
+            'total': {'BTC': 0, 'USD': 0, 'num': 0},
+            'USD': {'BTC': 0, 'USD': 0, 'num': 0}
+        }
+        for coinName, num in self.coins.items():
+            if allow_zero or num > 0:
+                if coinName == 'USDT':
+                    coinName = 'USD'
+                    BTC_value = num / BTC_price
+                elif coinName == 'BTC':
+                    BTC_value = num
+                else:
+                    BTC_value = self.get_price(coinName) * num
+                USD_value = BTC_value * BTC_price
 
-        # coins = {
-        #     'total': {'BTC': 0, 'USD': 0, 'num': 0},
-        #     'USD': {'BTC': 0, 'USD': 0, 'num': 0}
-        # }
-        # for coin in balances:
-        #     coinName = coin['asset']
-        #     num = float(coin['free']) + float(coin['locked'])
-        #     if allow_zero or num > 0:
-        #         if coinName == 'USDT':
-        #             coinName = 'USD'
-        #             BTC_value = num / BTC_price
-        #         elif coinName == 'BTC':
-        #             BTC_value = num
-        #         else:
-        #             BTC_value = self.get_price(coinName) * num
-        #         USD_value = BTC_value * BTC_price
-
-        #         # update info
-        #         coins[coinName] = {
-        #             'num': num,
-        #             'BTC': BTC_value,
-        #             'USD': USD_value
-        #         }
-        #         coins['total']['BTC'] += BTC_value
-        #         coins['total']['USD'] += USD_value
-        # return coins
-        pass
+                # update info
+                coins[coinName] = {
+                    'num': num,
+                    'BTC': BTC_value,
+                    'USD': USD_value
+                }
+                coins['total']['BTC'] += BTC_value
+                coins['total']['USD'] += USD_value
+        return coins
 
     def get_all_coin_balance(self, allow_zero=False):
         res = self.api.get_balance()
@@ -139,17 +136,6 @@ class Huobi(Exchange):
 # ------------------------------------------------------------------ #
 # --------------------------- API Wrapper -------------------------- #
 # ------------------------------------------------------------------ #
-import base64
-import datetime
-import hashlib
-import hmac
-import json
-import urllib
-import urllib.parse
-import urllib.request
-import requests
-
-
 class HuobiAPI:
     # API 请求地址
     MARKET_URL = "https://api.huobi.pro"
@@ -596,13 +582,6 @@ class HuobiAPI:
             params['symbol'] = symbol
         
         return self.api_key_get(params, url)
-
-
-
-
-
-
-
 
 
 def createSign(pParams, method, host_url, request_path, secret_key):

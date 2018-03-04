@@ -19,7 +19,7 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'coins':
         bot.get_all_coin_balance()
     elif sys.argv[1] == 'test':
-        pp.pprint(bot.huobi.coins)
+        pp.pprint(bot.huobi.get_full_balance())
         # res = bot.bittrex.market_sell_everything()
         # p(res)
         # print (bot.bithumb.api.place_market_sell(0.01, 'ETH'))

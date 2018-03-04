@@ -12,6 +12,10 @@ class Exchange:
         # return the specific pair format for this exchange
         raise NotImplementedError("Please Implement this method")
 
+    def get_all_trading_pairs(self):
+        # get all possible traing pairs in a set
+        raise NotImplementedError("Please Implement this method")
+
     def get_my_pair(self, coin, base):
         # return my format
         return '%s-%s' % (coin, base)
