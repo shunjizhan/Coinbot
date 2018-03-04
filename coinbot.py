@@ -1,6 +1,5 @@
 import pprint as pp
 import json
-
 from utils import p, show_coins, combine_coins, combine_markets
 from exchange.bittrex.bittrex import Bittrex
 from exchange.coinbase.coinbase import Coinbase
@@ -8,6 +7,7 @@ from exchange.binance.binance import Binance
 from exchange.gate.gate import Gate
 from exchange.dew.dew import Dew
 from exchange.bithumb.bithumb import Bithumb
+from exchange.huobi.huobi import Huobi
 
 
 class Coinbot:
@@ -22,30 +22,34 @@ class Coinbot:
         key_binance = keys['binance']
         key_gate = keys['gate']
         key_bithumb = keys['bithumb']
+        key_huobi = keys['huobi']
 
         print('')
 
-        self.gate = Gate(key_gate['key'], key_gate['secret'])
-        self.coinbase = Coinbase(key_coinbase['key'], key_coinbase['secret'], key_coinbase['pass'])
-        self.bittrex = Bittrex(key_bittrex['key'], key_bittrex['secret'])
-        self.binance = Binance(key_binance['key'], key_binance['secret'])
-        self.bithumb = Bithumb(key_bithumb['key'], key_bithumb['secret'])
-        self.dew = Dew()
+        self.huobi = Huobi(key_huobi['key'], key_huobi['secret'])
+        # self.gate = Gate(key_gate['key'], key_gate['secret'])
+        # self.coinbase = Coinbase(key_coinbase['key'], key_coinbase['secret'], key_coinbase['pass'])
+        # self.bittrex = Bittrex(key_bittrex['key'], key_bittrex['secret'])
+        # self.binance = Binance(key_binance['key'], key_binance['secret'])
+        # self.bithumb = Bithumb(key_bithumb['key'], key_bithumb['secret'])
+        # self.dew = Dew()
 
         self.all_exchanges = {
-            'bithumb': self.bithumb,
-            'gate': self.gate,
-            'dew': self.dew,
-            'coinbase': self.coinbase,
-            'binance': self.binance,
-            'bittrex': self.bittrex,
+            'huobi': self.huobi,
+            # 'bithumb': self.bithumb,
+            # 'gate': self.gate,
+            # 'dew': self.dew,
+            # 'coinbase': self.coinbase,
+            # 'binance': self.binance,
+            # 'bittrex': self.bittrex,
         }
 
         self.trading_exchanges = {
-            'gate': self.gate,
-            'binance': self.binance,
-            'bittrex': self.bittrex,
-            'bithumb': self.bithumb,
+            'huobi': self.huobi,
+            # 'gate': self.gate,
+            # 'binance': self.binance,
+            # 'bittrex': self.bittrex,
+            # 'bithumb': self.bithumb,
         }
 
         print('')

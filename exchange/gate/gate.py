@@ -23,7 +23,6 @@ class Gate(Exchange):
         return float(ticker) if ticker else 0
 
     def get_full_balance(self, allow_zero=False):
-        balances = json.loads(self.api.balances())['available']
         ETH_price = float(self.api.ticker('eth_usdt')['last'])
         BTC_price = float(self.api.ticker('btc_usdt')['last'])
 
@@ -31,16 +30,18 @@ class Gate(Exchange):
             'total': {'BTC': 0, 'USD': 0, 'num': 0},
             'USD': {'BTC': 0, 'USD': 0, 'num': 0}
         }
-        for coinName in balances:
-            num = float(balances[coinName])
+        for coinName, num in self.coins.items():
             if allow_zero or num > 0:
-                if coinName == 'USDT':
-                    coinName = 'USD'
+                if coinName in {'ONT_S'}:
+                    break
+                if coinName == 'USD':
                     USD_value = num
                 elif coinName == 'BTC':
                     USD_value = num / BTC_price
                 elif coinName in {'FIL', 'ETH'}:
                     USD_value = num * float(self.api.ticker('FIL_usdt')['last'])
+                elif coinName == 'NEO':
+                    USD_value = num * float(self.api.ticker('NEO_usdt')['last'])
                 else:
                     pair = '%s_eth' % coinName
                     price_in_USD = float(self.api.ticker(pair)['last']) * ETH_price

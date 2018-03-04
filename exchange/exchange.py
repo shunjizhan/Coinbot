@@ -59,6 +59,9 @@ class Exchange:
         '''
         raise NotImplementedError("Please Implement this method")
 
+    def get_market(self, coin, base):
+        raise NotImplementedError("Please Implement this method")
+
     def get_coin_balance(self, coin):
         if coin in self.coins.keys():
             return self.coins[coin]

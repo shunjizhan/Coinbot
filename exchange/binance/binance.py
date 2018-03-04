@@ -95,6 +95,10 @@ class Binance(Exchange):
                     markets[base].add(info['baseAsset'])
         return markets
 
+    def get_market(self, coin, base='BTC'):
+        pair = self.get_pair(coin, base)
+        return self.api.get_order_book(symbol=pair, limit=10)
+
     def market_buy(self, coin, base='BTC', quantity=0):
         pair = self.get_pair(coin, base)
         response = self.api.order_market_buy(symbol=pair, quantity=quantity)
