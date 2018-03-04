@@ -48,6 +48,7 @@ class Huobi(Exchange):
             'USD': {'BTC': 0, 'USD': 0, 'num': 0}
         }
         for coinName, num in self.coins.items():
+            coinName = coinName.upper()
             if allow_zero or num > 0:
                 if coinName == 'USDT':
                     coinName = 'USD'
@@ -80,16 +81,6 @@ class Huobi(Exchange):
             if allow_zero or num > 0:
                 coins[coinName] += num
         return dict(coins)
-
-    # def get_trading_pairs(self):
-    #     markets = {}
-    #     for base in self.market_bases:
-    #         markets[base] = set()
-    #         binance_markets = self.api.get_products()['data']
-    #         for info in binance_markets:
-    #             if info['quoteAsset'] == base:
-    #                 markets[base].add(info['baseAsset'])
-    #     return markets
 
     # def market_buy(self, coin, base='BTC', quantity=0):
     #     pair = self.get_pair(coin, base)
