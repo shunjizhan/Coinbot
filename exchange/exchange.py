@@ -13,7 +13,18 @@ class Exchange:
         raise NotImplementedError("Please Implement this method")
 
     def get_all_trading_pairs(self):
-        # get all possible traing pairs in a set
+        '''
+        get all possible traing pairs in the form
+        {
+            'bases': {'BTC', 'ETH', etc...},
+            'pairs': {
+                'BTC': { ... },
+                'ETH': { ... },
+                ......
+            }
+            'all_pairs': { ... },
+        }
+        '''
         raise NotImplementedError("Please Implement this method")
 
     def get_my_pair(self, coin, base):

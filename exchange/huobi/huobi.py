@@ -19,6 +19,7 @@ class Huobi(Exchange):
         return (coin + base).lower()
 
     def get_all_trading_pairs(self):
+        # ***** this needs to change form to updated one ***** #
         all_pairs = set()
         res = self.api.get_symbols()['data']
         for info in res:

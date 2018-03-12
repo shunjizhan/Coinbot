@@ -3,6 +3,7 @@
 
 import json
 
+from collections import defaultdict
 from .HttpUtil import httpGet, httpPost
 from ..exchange import Exchange
 
@@ -10,42 +11,59 @@ from ..exchange import Exchange
 class Gate(Exchange):
     def __init__(self, apikey, secretkey):
         self.api = GateAPI(apikey, secretkey)
+        self.markets = self.get_all_trading_pairs()
         super().__init__('gate')
         self.connect_success()
 
     def get_pair(self, coin, base):
-        return '%s_%s' % (coin, base)
+        return '%s_%s' % (coin.lower(), base.lower())
+
+    def get_all_trading_pairs(self):
+        pairs = self.api.pairs()
+        market_info = {
+            'bases': set(),
+            'pairs': defaultdict(set),
+            'all_pairs': set(),
+            'in_market': set()
+        }
+        for pair in pairs:
+            [coin, base] = pair.upper().split('_')
+            market_info['bases'].add(base)
+            market_info['pairs'][base].add(coin)
+            market_info['all_pairs'].add(pair)
+            market_info['in_market'].add(coin)
+        return market_info
 
     def get_price(self, coin, base='BTC', _type=0):
         TYPES = {0: 'highestBid', 1: 'lowestAsk', 2: 'last'}
         pair = self.get_pair(coin, base)
-        ticker = self.api.ticker(pair)[TYPES[_type]]
-        return float(ticker) if ticker else 0
+        ticker = self.api.ticker(pair)
+        return float(ticker[TYPES[_type]]) if ticker else 0
 
     def get_full_balance(self, allow_zero=False):
-        ETH_price = float(self.api.ticker('eth_usdt')['last'])
-        BTC_price = float(self.api.ticker('btc_usdt')['last'])
+        ETH_price = self.get_price('ETH', 'USDT')
+        BTC_price = self.get_price('BTC', 'USDT')
 
         coins = {
             'total': {'BTC': 0, 'USD': 0, 'num': 0},
             'USD': {'BTC': 0, 'USD': 0, 'num': 0}
         }
         for coinName, num in self.coins.items():
-            if allow_zero or num > 0:
-                if coinName in {'ONT_S'}:
-                    break
+            if allow_zero or num:
                 if coinName == 'USD':
-                    USD_value = num
+                    price_in_USD = 1
                 elif coinName == 'BTC':
                     USD_value = num / BTC_price
-                elif coinName in {'FIL', 'ETH'}:
-                    USD_value = num * float(self.api.ticker('FIL_usdt')['last'])
-                elif coinName == 'NEO':
-                    USD_value = num * float(self.api.ticker('NEO_usdt')['last'])
+                elif coinName in self.markets['pairs']['BTC']:
+                    price_in_USD = self.get_price(coinName, 'BTC') * BTC_price
+                elif coinName in self.markets['pairs']['ETH']:
+                    price_in_USD = self.get_price(coinName, 'ETH') * ETH_price
+                elif coinName in self.markets['pairs']['USDT']:
+                    price_in_USD = self.get_price(coinName, 'USDT')
                 else:
-                    pair = '%s_eth' % coinName
-                    price_in_USD = float(self.api.ticker(pair)['last']) * ETH_price
-                    USD_value = price_in_USD * num
+                    price_in_USD = 0
+
+                USD_value = price_in_USD * num
                 BTC_value = USD_value / BTC_price
 
                 # update info
@@ -59,26 +77,35 @@ class Gate(Exchange):
         return coins
 
     def get_all_coin_balance(self, allow_zero=False):
-        balances = json.loads(self.api.balances())['available']
+        balances = json.loads(self.api.balances())
+        balances_avail, balances_lock = balances['available'], balances['locked']
         coins = {}
-        for coinName in balances:
-            num = float(balances[coinName])
+        for coinName in balances_avail:
+            num = float(balances_avail[coinName])
             if coinName == 'USDT':
                 coinName = 'USD'
             if allow_zero or num > 0:
-                coins[coinName] = num
+                coins[coinName.upper()] = num
+
+        for coinName in balances_lock:
+            num = float(balances_lock[coinName])
+            if coinName == 'USDT':
+                coinName = 'USD'
+            if allow_zero or num > 0:
+                coins[coinName.upper()] += num
+
         return coins
 
-    def get_trading_pairs(self):
-        markets = {}
-        for base in self.market_bases:
-            markets[base] = set()
-            gate_markets = self.api.pairs()
-            for pair in gate_markets:
-                coin, gate_base = pair.split('_')
-                if gate_base.upper() == base:
-                    markets[base].add(coin.upper())
-        return markets
+    # def get_trading_pairs(self):
+    #     markets = {}
+    #     for base in self.market_bases:
+    #         markets[base] = set()
+    #         gate_markets = self.api.pairs()
+    #         for pair in gate_markets:
+    #             coin, gate_base = pair.split('_')
+    #             if gate_base.upper() == base:
+    #                 markets[base].add(coin.upper())
+    #     return markets
 
 
 # ------------------------------------------------------------------ #

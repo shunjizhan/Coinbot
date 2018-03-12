@@ -26,7 +26,7 @@ class Coinbot:
 
         print('')
 
-        self.huobi = Huobi(key_huobi['key'], key_huobi['secret'])
+        # self.huobi = Huobi(key_huobi['key'], key_huobi['secret'])
         self.gate = Gate(key_gate['key'], key_gate['secret'])
         self.coinbase = Coinbase(key_coinbase['key'], key_coinbase['secret'], key_coinbase['pass'])
         self.bittrex = Bittrex(key_bittrex['key'], key_bittrex['secret'])
@@ -35,7 +35,7 @@ class Coinbot:
         self.dew = Dew()
 
         self.all_exchanges = {
-            'huobi': self.huobi,
+            # 'huobi': self.huobi,
             'bithumb': self.bithumb,
             'gate': self.gate,
             'dew': self.dew,
@@ -45,7 +45,7 @@ class Coinbot:
         }
 
         self.trading_exchanges = {
-            'huobi': self.huobi,
+            # 'huobi': self.huobi,
             'gate': self.gate,
             'binance': self.binance,
             'bittrex': self.bittrex,
