@@ -12,7 +12,19 @@ from exchange.huobi.huobi import Huobi
 
 class Coinbot:
     def __init__(self):
+        self.avail_exchanges = {
+            'coinbase',
+            'bittrex',
+            'binance',
+            'gate',
+            'bithumb',
+            'huobi',
+            'dew'
+        }
         self.connect_exchanges()
+
+    def has_ex(self, ex_name):
+        return ex_name in self.avail_exchanges
 
     def connect_exchanges(self):
         with open('./keys.json') as key_file:
@@ -26,31 +38,23 @@ class Coinbot:
 
         print('')
 
-        # self.huobi = Huobi(key_huobi['key'], key_huobi['secret'])
-        self.gate = Gate(key_gate['key'], key_gate['secret'])
-        self.coinbase = Coinbase(key_coinbase['key'], key_coinbase['secret'], key_coinbase['pass'])
-        self.bittrex = Bittrex(key_bittrex['key'], key_bittrex['secret'])
-        self.binance = Binance(key_binance['key'], key_binance['secret'])
-        self.bithumb = Bithumb(key_bithumb['key'], key_bithumb['secret'])
-        self.dew = Dew()
-
         self.all_exchanges = {
-            # 'huobi': self.huobi,
-            'bithumb': self.bithumb,
-            'gate': self.gate,
-            'dew': self.dew,
-            'coinbase': self.coinbase,
-            'binance': self.binance,
-            'bittrex': self.bittrex,
+            'huobi': Huobi(key_huobi['key'], key_huobi['secret']) if self.has_ex('huobi') else None,
+            'bithumb': Bithumb(key_bithumb['key'], key_bithumb['secret']) if self.has_ex('bithumb') else None,
+            'gate': Gate(key_gate['key'], key_gate['secret']) if self.has_ex('gate') else None,
+            'dew': Dew() if self.has_ex('dew') else None,
+            'coinbase': Coinbase(key_coinbase['key'], key_coinbase['secret'], key_coinbase['pass']) if self.has_ex('coinbase') else None,
+            'binance': Binance(key_binance['key'], key_binance['secret']) if self.has_ex('binance') else None,
+            'bittrex': Bittrex(key_bittrex['key'], key_bittrex['secret']) if self.has_ex('bittrex') else None,
         }
 
-        self.trading_exchanges = {
-            # 'huobi': self.huobi,
-            'gate': self.gate,
-            'binance': self.binance,
-            'bittrex': self.bittrex,
-            'bithumb': self.bithumb,
-        }
+        # self.trading_exchanges = {
+        #     'huobi': self.huobi,
+        #     'gate': self.gate,
+        #     'binance': self.binance,
+        #     'bittrex': self.bittrex,
+        #     'bithumb': self.bithumb,
+        # }
 
         print('')
 
@@ -103,7 +107,7 @@ class Coinbot:
                 print('{:s}-{:s} {:.1f}% {:.1f}% {:s} > {:s}'.format(coin, base, diff * 100, real_diff * 100, ex_high, ex_low))
 
     def get_full_balance(self, full=False, allow_zero=False):
-        BTC_price = self.coinbase.get_BTC_price()
+        BTC_price = self.all_exchanges['coinbase'].get_BTC_price()
         USD_out = 2000 + 8888 + 8338
         all_coins = {
             'total': {
@@ -114,10 +118,11 @@ class Coinbot:
         }
 
         for ex_name, exchange in self.all_exchanges.items():
-            coins = exchange.get_full_balance(allow_zero=allow_zero)
-            combine_coins(all_coins, coins)
-            p(ex_name + ': '),
-            show_coins(coins)
+            if exchange:
+                coins = exchange.get_full_balance(allow_zero=allow_zero)
+                combine_coins(all_coins, coins)
+                p(ex_name + ': '),
+                show_coins(coins)
 
         print('Out:     ' + str(USD_out) + ' 100%'),
 

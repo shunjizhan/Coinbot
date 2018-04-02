@@ -14,6 +14,7 @@ if __name__ == '__main__':
         bot.get_full_balance(full=False)
     elif sys.argv[1] == 'full':
         bot.get_full_balance(full=True, allow_zero=False)
+        # pp.pprint(bot.huobi.coins)
     elif sys.argv[1] == 'diff':
         bot.get_all_diff_rate(min_diff=0.001)
     elif sys.argv[1] == 'coins':
