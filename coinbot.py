@@ -15,7 +15,7 @@ class Coinbot:
         self.avail_exchanges = {
             'coinbase',
             'bittrex',
-            'binance',
+            # 'binance',
             'gate',
             'bithumb',
             'huobi',
@@ -61,6 +61,40 @@ class Coinbot:
     # --------------------------------------------------------------------------------------------- #
     # ------------------------------------------ View --------------------------------------------- #
     # --------------------------------------------------------------------------------------------- #
+    def get_full_balance(self, full=False, allow_zero=False):
+        BTC_price = self.all_exchanges['huobi'].get_BTC_price()
+        USD_out = 2000 + 8888 + 8338
+        all_coins = {
+            'total': {
+                'BTC': USD_out / BTC_price,
+                'USD': USD_out,
+                'num': 0
+            }
+        }
+
+        for ex_name, exchange in self.all_exchanges.items():
+            if exchange:
+                coins = exchange.get_full_balance(allow_zero=allow_zero)
+                combine_coins(all_coins, coins)
+                p(ex_name + ': '),
+                show_coins(coins)
+
+        print('Out:     ' + str(USD_out) + ' 100%'),
+
+        p('Total:   '),
+        show_coins(all_coins, full=full, USD_out=USD_out)
+
+        p('Ratio:   ')
+        print(round(all_coins['total']['USD'] / 68800.0, 3))
+
+    def get_all_coin_balance(self, allow_zero=False):
+        pp.pprint(self.all_exchanges)
+        for ex_name, exchange in self.all_exchanges.items():
+            coins = exchange.get_all_coin_balance(allow_zero)
+            print('--------------------------')
+            print(ex_name)
+            print(coins)
+
     def get_all_diff_rate(self, min_diff=0.03):
         all_markets = {}
         for ex_name, exchange in self.trading_exchanges.items():
@@ -106,39 +140,6 @@ class Coinbot:
                 )
                 print('{:s}-{:s} {:.1f}% {:.1f}% {:s} > {:s}'.format(coin, base, diff * 100, real_diff * 100, ex_high, ex_low))
 
-    def get_full_balance(self, full=False, allow_zero=False):
-        BTC_price = self.all_exchanges['coinbase'].get_BTC_price()
-        USD_out = 2000 + 8888 + 8338
-        all_coins = {
-            'total': {
-                'BTC': USD_out / BTC_price,
-                'USD': USD_out,
-                'num': 0
-            }
-        }
-
-        for ex_name, exchange in self.all_exchanges.items():
-            if exchange:
-                coins = exchange.get_full_balance(allow_zero=allow_zero)
-                combine_coins(all_coins, coins)
-                p(ex_name + ': '),
-                show_coins(coins)
-
-        print('Out:     ' + str(USD_out) + ' 100%'),
-
-        p('Total:   '),
-        show_coins(all_coins, full=full, USD_out=USD_out)
-
-        p('Ratio:   ')
-        print(round(all_coins['total']['USD'] / 68800.0, 3))
-
-    def get_all_coin_balance(self, allow_zero=False):
-        pp.pprint(self.all_exchanges)
-        for ex_name, exchange in self.all_exchanges.items():
-            coins = exchange.get_all_coin_balance(allow_zero)
-            print('--------------------------')
-            print(ex_name)
-            print(coins)
 
     def get_bittrex_profit_ratio(self, base=200):
         # *** not updated ***

@@ -47,7 +47,7 @@ class Huobi(Exchange):
         }
         for coinName, num in self.coins.items():
             coinName = coinName.upper()
-            if allow_zero or num > 0:
+            if allow_zero or num != 0:
                 if coinName == 'USDT':
                     coinName = 'USD'
                     BTC_value = num / BTC_price
@@ -68,15 +68,14 @@ class Huobi(Exchange):
         return coins
 
     def get_all_coin_balance(self, allow_zero=False):
-        res = self.api.get_balance()
-        balances = res['data']['list']
+        balances = self.api.get_balance()
         coins = defaultdict(float)
         for coin in balances:
             coinName = coin['currency']
             num = float(coin['balance'])
             if coinName == 'USDT':
                 coinName = 'USD'
-            if allow_zero or num > 0:
+            if allow_zero or num != 0:
                 coins[coinName] += num
         return dict(coins)
 
@@ -133,7 +132,15 @@ class HuobiAPI:
     def __init__(self, api_key, api_secret):
         self.api_key = api_key
         self.api_secret = api_secret
-        self.account_id = self.get_accounts()
+
+        self.margin_accs = set()
+        all_accounts = self.get_accounts()['data']
+        for acc in all_accounts:
+            acc_id = acc['id']
+            if acc['type'] == 'spot':
+                self.account_id = acc_id
+            elif acc['type'] == 'margin':
+                self.margin_accs.add(acc_id)
 
     def api_key_get(self, params, request_path):
         method = 'GET'
@@ -190,10 +197,9 @@ class HuobiAPI:
         """
         params = {'symbol': symbol,
                   'type': type}
-        
+
         url = self.MARKET_URL + '/market/depth'
         return http_get_request(url, params)
-
 
     # 获取tradedetail
     def get_trade(self, symbol):
@@ -206,7 +212,6 @@ class HuobiAPI:
         url = self.MARKET_URL + '/market/trade'
         return http_get_request(url, params)
 
-
     # 获取merge ticker
     def get_ticker(self, symbol):
         """
@@ -217,7 +222,6 @@ class HuobiAPI:
 
         url = self.MARKET_URL + '/market/detail/merged'
         return http_get_request(url, params)
-
 
     # 获取 Market Detail 24小时成交量数据
     def get_detail(self, symbol):
@@ -245,29 +249,42 @@ class HuobiAPI:
     Trade/Account API
     '''
 
-
     def get_accounts(self):
         """
         :return: 
         """
         path = "/v1/account/accounts"
         params = {}
-        return self.api_key_get(params, path)['data'][0]['id']
+        return self.api_key_get(params, path)
 
     # 获取当前账户资产
-    def get_balance(self, acct_id=None):
+    def _get_spot_balance(self):
         """
         :param acct_id
         :return:
         """
-        
-        # if not acct_id:
-        #     accounts = self.get_accounts()
-        #     acct_id = accounts['data'][0]['id'];
-
         url = "/v1/account/accounts/{0}/balance".format(self.account_id)
         params = {"account-id": self.account_id}
-        return self.api_key_get(params, url)
+        return self.api_key_get(params, url)['data']['list']
+
+    def _get_margin_balance(self):
+        """
+        :param acct_id
+        :return:
+        """
+        balances = []
+        for acc_id in self.margin_accs:
+            url = "/v1/account/accounts/{0}/balance".format(acc_id)
+            params = {"account-id": acc_id}
+            balances.extend(self.api_key_get(params, url)['data']['list'])
+
+        return balances
+
+    def get_balance(self):
+        balance = self._get_spot_balance()
+        margin_bal = self._get_margin_balance()
+        balance.extend(margin_bal)
+        return balance
 
 
     # 下单
