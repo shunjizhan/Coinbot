@@ -78,6 +78,7 @@ class Gate(Exchange):
 
     def get_all_coin_balance(self, allow_zero=False):
         balances = json.loads(self.api.balances())
+        # print (balances)
         balances_avail, balances_lock = balances['available'], balances['locked']
         coins = {}
         for coinName in balances_avail:

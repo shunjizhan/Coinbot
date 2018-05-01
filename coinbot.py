@@ -15,7 +15,7 @@ class Coinbot:
         self.avail_exchanges = {
             'coinbase',
             'bittrex',
-            # 'binance',
+            'binance',
             'gate',
             'bithumb',
             'huobi',
@@ -62,8 +62,14 @@ class Coinbot:
     # ------------------------------------------ View --------------------------------------------- #
     # --------------------------------------------------------------------------------------------- #
     def get_full_balance(self, full=False, allow_zero=False):
+        # for ex in self.all_exchanges.values():
+        #     if hasattr(ex, 'get_BTC_price'):
+        #         BTC_price = ex.get_BTC_price()
+        # assert(BTC_price)
+
         BTC_price = self.all_exchanges['huobi'].get_BTC_price()
-        USD_out = 2000 + 8888 + 8338
+
+        USD_out = 2000 + 8888 + 8338 + 4548 + 2034 + 5248
         all_coins = {
             'total': {
                 'BTC': USD_out / BTC_price,

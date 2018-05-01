@@ -8,6 +8,37 @@ def p(x):
     pp.pprint(x)
 
 
+def run(bot):
+    VALID_COMMANDS = {
+        'balance',  # check balance of an exchange | balance [exchange]
+        'coins',    # check coins of an exchange | coins [exchange]
+        'price',    # check price of a pair in an exchange | price [coin] [base] [exchange]
+        'diff',    # check price diff
+    }
+    while(True):
+        _input = input(">> ")
+
+        if _input in {'q', 'quit'}:
+            print('EOSGOGO!!')
+            exit(0)
+
+        _inputs = _input.split(' ')
+
+        if (len(_inputs) == 2):
+            command, exchange = _inputs[0], _inputs[1]
+        elif (len(_inputs) == 4):
+            command, coin, base, exchange = _inputs[0], _inputs[1], _inputs[2], _inputs[3]
+
+        if command == 'balance':
+            p(bot.all_exchanges[exchange].get_full_balance())
+        elif command == 'coins':
+            p(bot.all_exchanges[exchange].coins)
+        elif command == 'price':
+            p(bot.all_exchanges[exchange].get_price(coin, base))
+        else:
+            print('This command has some problem! Re-enter!')
+
+
 if __name__ == '__main__':
     bot = Coinbot()
     if len(sys.argv) == 1:
@@ -20,7 +51,7 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'coins':
         bot.get_all_coin_balance()
     elif sys.argv[1] == 'test':
-        pp.pprint(bot.all_exchanges['huobi'].api.get_balance())
+        pp.pprint(bot.all_exchanges['huobi'].get_full_balance())
         # pp.pprint(bot.gate.markets)
         # pp.pprint(bot.gate.get_full_balance())
         # res = bot.bittrex.market_sell_everything()
@@ -42,5 +73,8 @@ if __name__ == '__main__':
         # print (bot.bithumb.api.get_my_ticker())
         # # print (bot.bithumb.api.get_my_orders())
         # print (bot.bithumb.api.get_my_transactions())
+    elif sys.argv[1] == 'run':
+        run(bot)
+
     else:
         print('nothing to do...')

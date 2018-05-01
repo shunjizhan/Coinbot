@@ -2,6 +2,7 @@ import datetime
 import urllib
 import urllib.parse
 import urllib.request
+import pprint as pp
 
 from collections import defaultdict
 from .utils import createSign, http_get_request, http_post_request
@@ -283,6 +284,7 @@ class HuobiAPI:
     def get_balance(self):
         balance = self._get_spot_balance()
         margin_bal = self._get_margin_balance()
+        # pp.pprint(margin_bal)
         balance.extend(margin_bal)
         return balance
 

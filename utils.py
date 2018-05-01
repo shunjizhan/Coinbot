@@ -37,8 +37,11 @@ def show_coins(coins, full=False, USD_out=0):
     else:
         p(coins['total']['USD'])
 
-    # cang wei
-    cash_ratio = round(coins['USD']['USD'] * 100.0 / (coins['total']['USD'] - USD_out), 1)
+    # 仓位
+    if coins['total']['USD'] > 0:
+        cash_ratio = round(coins['USD']['USD'] * 100.0 / (coins['total']['USD'] - USD_out), 1)
+    else:
+        cash_ratio = 0
     coin_ratio = str(100 - cash_ratio)
     print(coin_ratio + '%')
 
