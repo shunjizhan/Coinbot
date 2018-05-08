@@ -1,5 +1,7 @@
 import pprint as pp
 import sys
+import time
+import os
 
 from coinbot import Coinbot
 
@@ -39,6 +41,20 @@ def run(bot):
             print('This command has some problem! Re-enter!')
 
 
+def check_ae_in_huobi(ex):
+    while True:
+        all_coins = ex.get_all_trading_coins()
+        if 'ae' in all_coins:
+            while True:
+                os.system("osascript -e \'display notification \"AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!AE!\" \'")
+                time.sleep(5)
+            # print('*' * 10000)
+        else:
+            print('not yet')
+
+        time.sleep(60)
+
+
 if __name__ == '__main__':
     bot = Coinbot()
     if len(sys.argv) == 1:
@@ -51,7 +67,7 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'coins':
         bot.get_all_coin_balance()
     elif sys.argv[1] == 'test':
-        pp.pprint(bot.all_exchanges['huobi'].get_full_balance())
+        check_ae_in_huobi(bot.all_exchanges['huobi'])
     elif sys.argv[1] == 'run':
         run(bot)
     else:

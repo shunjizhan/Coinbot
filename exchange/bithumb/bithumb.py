@@ -21,7 +21,7 @@ class Bithumb(Exchange):
     def get_price(self, coin, base='BTC', _type=0):
         TYPES = {0: 'sell_price', 1: 'buy_price'}
         if coin not in self.base_coins or base not in self.base_coins:
-            raise Exception('%s doesnt have this pair!' % self.name)
+            raise Exception('%s doesnt have this pair [%s]!' % (self.name, coin + base))
         coin_price = float(self.api.get_ticker(coin)['data'][TYPES[_type]])
         base_price = float(self.api.get_ticker(base)['data'][TYPES[_type]])
         return coin_price / base_price
@@ -61,8 +61,11 @@ class Bithumb(Exchange):
         return coins
 
     def get_all_coin_balance(self, allow_zero=False):
+        return {'ETH': 2.65}
+
         res = {}
         for coin in self.base_coins:
+            # print(self.api.get_balance(coin)['data'])
             num = self.api.get_balance(coin)['data']['total_' + coin.lower()]
             res[coin] = float(num)
         return res

@@ -29,6 +29,15 @@ class Huobi(Exchange):
             all_pairs.add(self.get_pair(coin, base))
         return all_pairs
 
+    def get_all_trading_coins(self):
+        # ***** this needs to change form to updated one ***** #
+        all_coins = set()
+        res = self.api.get_symbols()['data']
+        for info in res:
+            coin = info['base-currency']
+            all_coins.add(coin)
+        return all_coins
+
     def get_BTC_price(self):
         return self.get_price('BTC', base='USDT')
 

@@ -27,6 +27,13 @@ class Exchange:
         '''
         raise NotImplementedError("Please Implement this method")
 
+    def get_all_trading_coins(self):
+        '''
+        get all possible traing coins in the form
+        {'eos, neo, ...'}
+        '''
+        raise NotImplementedError("Please Implement this method")
+
     def get_my_pair(self, coin, base):
         # return my format
         return '%s-%s' % (coin, base)
