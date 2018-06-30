@@ -12,7 +12,7 @@ class Bithumb(Exchange):
         self.api = BithumbAPI(key, secret)
         super().__init__('bithumb')
         self.connect_success()
-        self.KRW_USD_rate = get_rate('KRW', 'USD')
+        # self.KRW_USD_rate = get_rate('KRW', 'USD')
         self.cmk = Cmk()
 
     def get_BTC_price(self):
@@ -61,7 +61,7 @@ class Bithumb(Exchange):
         return coins
 
     def get_all_coin_balance(self, allow_zero=False):
-        return {'ETH': 2.65}
+        return {'ETH': 0}
 
         res = {}
         for coin in self.base_coins:

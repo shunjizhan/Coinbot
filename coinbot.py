@@ -15,11 +15,11 @@ class Coinbot:
         self.avail_exchanges = {
             'coinbase',
             'bittrex',
-            'binance',
+            # 'binance',
             'gate',
             'bithumb',
             'huobi',
-            'dew'
+            # 'dew'
         }
         self.connect_exchanges()
 
@@ -69,7 +69,7 @@ class Coinbot:
 
         BTC_price = self.all_exchanges['huobi'].get_BTC_price()
 
-        USD_out = 2000 + 8888 + 8338 + 4548 + 2034 + 5248
+        USD_out = 2000 + 8888 + 8338 + 4548 + 2034 + 5248 + 1099 + 3758
         all_coins = {
             'total': {
                 'BTC': USD_out / BTC_price,
@@ -91,7 +91,8 @@ class Coinbot:
         show_coins(all_coins, full=full, USD_out=USD_out)
 
         p('Ratio:   ')
-        print(round(all_coins['total']['USD'] / 68800.0, 3))
+        base = 82300
+        print(round(all_coins['total']['USD'] / base, 3))
 
     def get_all_coin_balance(self, allow_zero=False):
         pp.pprint(self.all_exchanges)

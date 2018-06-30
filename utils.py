@@ -1,6 +1,6 @@
 import sys
 import requests
-
+import pprint as pp
 
 def p(*args):
     for x in args:
@@ -87,10 +87,15 @@ def combine_markets(m1, m2):
 
 
 def get_rate(currency, base):
-    url = 'https://api.fixer.io/latest?base=%s' % base
+    # *** this needs update
+    key = '97d6041822759bd2b86a1f153329ed78'
+    url = 'https://api.fixer.io/latest?access_key=%s&base=%s' % (key, base)
+    pp.pprint (requests.get(url).json())
     return requests.get(url).json()['rates'][currency]
 
 
+if __name__ == '__main__':
+    pp.pprint(get_rate('krw','usd'))
 
 
 
