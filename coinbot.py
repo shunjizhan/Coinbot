@@ -85,6 +85,20 @@ class Coinbot:
                 p(ex_name + ': '),
                 show_coins(coins)
 
+        # add hot wallet EOS
+        tp_eos = 1344
+        tp_usdt = tp_eos * self.all_exchanges['huobi'].get_price('EOS', 'USDT')
+        tp_coins = {
+            'EOS': {
+                'BTC': tp_usdt / BTC_price,
+                'USD': tp_usdt,
+                'num': tp_eos
+            }
+        }
+        combine_coins(all_coins, tp_coins)
+        p('TP' + ': '),
+        show_coins(coins)
+
         print('Out:     ' + str(USD_out) + ' 100%'),
 
         p('Total:   '),

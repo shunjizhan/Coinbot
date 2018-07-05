@@ -53,6 +53,7 @@ class Gate(Exchange):
                 if coinName == 'USD':
                     price_in_USD = 1
                 elif coinName == 'BTC':
+                    price_in_USD = BTC_price
                     USD_value = num / BTC_price
                 elif coinName in self.markets['pairs']['BTC']:
                     price_in_USD = self.get_price(coinName, 'BTC') * BTC_price
