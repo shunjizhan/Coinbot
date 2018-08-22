@@ -1,8 +1,7 @@
-# Coinbot
-This is a cryptocurrency trading operating system. 
-
 ## Introduction
-Being a cryptocurrency lover and technology enthusiast, I implemented this Coinbot for researching and learning purpose (also for fun!).<br>
+Coinbot is a cryptocurrency trading operating system.<br>
+
+Being a cryptocurrency lover and technology enthusiast, I implemented this smart bot for researching and learning purpose (also for fun!).<br>
 
 Using it arbitrarily is risky, and could potentially lose real money! Don't import your API keys until you had examine the code and comfirmed it worked! If you are looking for a public library with more robust and comprehensive functionality, check [this](https://github.com/ccxt/ccxt) out!
 
@@ -37,13 +36,60 @@ Using it arbitrarily is risky, and could potentially lose real money! Don't impo
 - Bithumb [South Korea]
 - Bifinex [British Virgin Islands] (coming soon)
 - Kraken [U.S.] (coming soon)
-- Okex [China] (coming soon)
+- Okex [China] (coming soon)  
 
-## Install
 
 ## Run
+### import API keys
+in root folder create a `keys.json` with format:
+```
+{
+    "coinbase": {
+        "key": "",
+        "secret": "",
+        "pass": ""
+    },
+    "bittrex": {
+        "key": "",
+        "secret": ""
+    },
+    "binance": {
+        "key": "",
+        "secret": ""
+    },
+    "gate": {
+        "key": "",
+        "secret": ""
+    },
+    "bithumb": {
+        "key": "",
+        "secret": ""
+    },
+    "huobi": {
+        "key": "",
+        "secret": ""
+    }
+}
+```
 
-## TODO
+### install
+`make install`
+
+### view/trade
+- get USD balance in all exchanges<br>
+`make`
+
+- get detailed tokens and USD balances in all exchanges<br>
+`make full`
+
+- start to monitor price difference<br>
+`make diff`
+
+- start to command line interface<br>
+`make run`
+
+- other functionalities<br>
+Makefile only wrapped some most commonly used operations, for other functionalities we can modify the code and call them directly!
 
 
 # Author
