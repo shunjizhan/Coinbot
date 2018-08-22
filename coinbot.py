@@ -40,12 +40,12 @@ class Coinbot:
 
         self.all_exchanges = {
             'huobi': Huobi(key_huobi['key'], key_huobi['secret']) if self.has_ex('huobi') else None,
-            'bithumb': Bithumb(key_bithumb['key'], key_bithumb['secret']) if self.has_ex('bithumb') else None,
+            # 'bithumb': Bithumb(key_bithumb['key'], key_bithumb['secret']) if self.has_ex('bithumb') else None,
             'gate': Gate(key_gate['key'], key_gate['secret']) if self.has_ex('gate') else None,
-            'dew': Dew() if self.has_ex('dew') else None,
-            'coinbase': Coinbase(key_coinbase['key'], key_coinbase['secret'], key_coinbase['pass']) if self.has_ex('coinbase') else None,
-            'binance': Binance(key_binance['key'], key_binance['secret']) if self.has_ex('binance') else None,
-            'bittrex': Bittrex(key_bittrex['key'], key_bittrex['secret']) if self.has_ex('bittrex') else None,
+            # 'dew': Dew() if self.has_ex('dew') else None,
+            # 'coinbase': Coinbase(key_coinbase['key'], key_coinbase['secret'], key_coinbase['pass']) if self.has_ex('coinbase') else None,
+            # 'binance': Binance(key_binance['key'], key_binance['secret']) if self.has_ex('binance') else None,
+            # 'bittrex': Bittrex(key_bittrex['key'], key_bittrex['secret']) if self.has_ex('bittrex') else None,
         }
 
         # self.trading_exchanges = {
@@ -86,7 +86,7 @@ class Coinbot:
                 show_coins(coins)
 
         # add hot wallet EOS
-        tp_eos = 1344
+        tp_eos = 500
         tp_usdt = tp_eos * self.all_exchanges['huobi'].get_price('EOS', 'USDT')
         tp_coins = {
             'EOS': {
@@ -97,7 +97,7 @@ class Coinbot:
         }
         combine_coins(all_coins, tp_coins)
         p('TP' + ': '),
-        show_coins(coins)
+        show_coins(tp_coins)
 
         print('Out:     ' + str(USD_out) + ' 100%'),
 
@@ -105,7 +105,7 @@ class Coinbot:
         show_coins(all_coins, full=full, USD_out=USD_out)
 
         p('Ratio:   ')
-        base = 82300
+        base = 86800
         print(round(all_coins['total']['USD'] / base, 3))
 
     def get_all_coin_balance(self, allow_zero=False):
