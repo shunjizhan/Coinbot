@@ -1,9 +1,14 @@
 # Coinbot
-This is a cryptocurrency trading operating system. (EOSGOGO!)
+This is a cryptocurrency trading operating system. 
 
-# Functionalities
+## Introduction
+Being a cryptocurrency lover and technology enthusiast, I implemented this Coinbot for researching and learning purpose (also for fun!).<br>
 
-## Basic
+Using it arbitrarily is risky, and could potentially lose real money! Don't import your API keys until you had examine the code and comfirmed it worked! If you are looking for a public library with more robust and comprehensive functionality, check [this](https://github.com/ccxt/ccxt) out!
+
+## Functionalities
+
+### Basic
 - view current exchange rate of any token pair in any exchange
 - view quoted depths of any token pair in any exchange
 - view any of your cryptocurrency balance in any exchange
@@ -11,18 +16,34 @@ This is a cryptocurrency trading operating system. (EOSGOGO!)
 - calculate your fiat currency balance in any exchange
 - calculate your combined fiat currency balances in some/all exchanges
 
-## Advanced
+### Advanced
 - buy/sell any cryptocurrency in any exchange
 - batch buy/sell cryptocurrencies in any exchange
 - monitor price difference of any pair of tokens across some/all exchanges
 - transfer your token from one exchange to another (highly risky! manual transfer recommended)
 
-## Pro (alpha)
+### Pro (alpha)
 - interest arbitrage across some/all exchanges, with different strategies, such as "brick moving" (low efficiency) or hedging (high efficiency)
 - quantitative trading in any exchange, with customized parameters
 
 
-# Supported Exchanges
+## Supported Exchanges
+- Coinbase [U.S.]
+- Bittrex [U.S.]
+- Huobi [China]
+- Binance [Japan]
+- Gate [China]
+- Dew [?]
+- Bithumb [South Korea]
+- Bifinex [British Virgin Islands] (coming soon)
+- Kraken [U.S.] (coming soon)
+- Okex [China] (coming soon)
+
+## Install
+
+## Run
+
+## TODO
 
 
 # Author
