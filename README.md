@@ -1,12 +1,11 @@
-## Introduction
+# Introduction
 Coinbot is a cryptocurrency trading operating system.<br>
 
 Being a cryptocurrency lover and technology enthusiast, I implemented this smart bot for researching and learning purpose (also for fun!).<br>
 
-Using it arbitrarily is risky, and could potentially lose real money! Don't import your API keys until you had examine the code and comfirmed it worked! If you are looking for a public library with more robust and comprehensive functionality, check [this](https://github.com/ccxt/ccxt) out!
+Using it arbitrarily is risky, and could potentially lose real money! Don't import your API keys until you had examine the code and comfirmed it worked! If you are looking for a public library with more robust and comprehensive functionality, check [ccxt](https://github.com/ccxt/ccxt) out!
 
-## Functionalities
-
+# Functionalities
 ### Basic
 - view current exchange rate of any token pair in any exchange
 - view quoted depths of any token pair in any exchange
@@ -26,20 +25,25 @@ Using it arbitrarily is risky, and could potentially lose real money! Don't impo
 - quantitative trading in any exchange, with customized parameters
 
 
-## Supported Exchanges
-- Coinbase [U.S.]
-- Bittrex [U.S.]
-- Huobi [China]
-- Binance [Japan]
-- Gate [China]
-- Dew [?]
-- Bithumb [South Korea]
-- Bifinex [British Virgin Islands] (coming soon)
-- Kraken [U.S.] (coming soon)
-- Okex [China] (coming soon)  
+# Supported Exchanges
+| Logo     | Exchange     | Location     | Fiat Currency Support | Remark   |
+| :------: | :------: | :------: | :------: |:------: |
+| ![](https://raw.githubusercontent.com/shunjizhan/Coinbot/master/img/gdax.jpg?raw=true) | Coinbase | U.S. | Yes  |    |
+| ![](https://raw.githubusercontent.com/shunjizhan/Coinbot/master/img/bittrex.jpg?raw=true) | Bittrex | U.S. | No  |    |
+| ![](https://raw.githubusercontent.com/shunjizhan/Coinbot/master/img/huobi.jpg?raw=true) | Huobi | China | No  |    |
+| ![](https://raw.githubusercontent.com/shunjizhan/Coinbot/master/img/binance.jpg?raw=true) | Binance | Japan |  No |    |
+| ![](https://raw.githubusercontent.com/shunjizhan/Coinbot/master/img/dew.jpg?raw=true) | Dew | ? | No  |    |
+| ![](https://raw.githubusercontent.com/shunjizhan/Coinbot/master/img/bitfinex.jpg?raw=true) | Bitfinex | British Virgin Islands | Yes   | coming soon  |
+| ![](https://raw.githubusercontent.com/shunjizhan/Coinbot/master/img/gate.jpg?raw=true) | Gate | China | No  |    |
+| ![](https://raw.githubusercontent.com/shunjizhan/Coinbot/master/img/bithumb.jpg?raw=true) | Bithumb | South Korea | Yes  |    |
+| ![](https://raw.githubusercontent.com/shunjizhan/Coinbot/master/img/kraken.jpg?raw=true) | Kraken | U.S. | Yes   | coming soon  |
+| ![](https://raw.githubusercontent.com/shunjizhan/Coinbot/master/img/okex.jpg?raw=true) | Okex | China |  No  | coming soon  |
+
+credit: some icons are from ccxt.
 
 
-## Run
+
+# Run
 ### import API keys
 in root folder create a `keys.json` with format:
 ```
