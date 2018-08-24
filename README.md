@@ -1,9 +1,12 @@
 # Introduction
-Coinbot is a cryptocurrency trading operating system.<br>
+Coinbot is a cryptocurrency trading bot, which aims to manage accounts across all exchanges, and provide efficient view/trade/monitor/transfer operations, ALL IN ONE PLACE. <br>
 
-Being a cryptocurrency lover and technology enthusiast, I implemented this smart bot for researching and learning purpose (also for fun!).<br>
+Based on these basic operations, we can conveniently build our own high level strategies, such as stop-limit order, batch buy/sell, hedging, and quantitative trading. <br>
 
-Using it arbitrarily is risky, and could potentially lose real money! Don't import your API keys until you had examine the code and comfirmed it worked! If you are looking for a public library with more robust and comprehensive functionality, check [ccxt](https://github.com/ccxt/ccxt) out!
+# Note
+Being a cryptocurrency lover and technology enthusiast, I implemented this cute bot for researching and learning purpose (also for fun ^_^). Using it arbitrarily could be risky, and could potentially lose real money, so be vigilant!<br>
+
+If you are looking for a public library with more robust and comprehensive functionality, check [ccxt](https://github.com/ccxt/ccxt) out!
 
 # Functionalities
 ### Basic
@@ -89,7 +92,7 @@ in root folder create a `keys.json` with format:
 - start to monitor price difference<br>
 `make diff`
 
-- start to command line interface<br>
+- start the command line interface<br>
 `make run`
 
 - other functionalities<br>
