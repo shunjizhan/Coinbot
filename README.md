@@ -1,7 +1,7 @@
 # Introduction
 Coinbot is a cryptocurrency trading bot, which aims to manage accounts across all exchanges, and provide efficient view/trade/monitor/transfer operations, ALL IN ONE PLACE. <br>
 
-Based on these basic operations, we can conveniently build our own high level strategies, such as stop-limit order, batch buy/sell, hedging, and quantitative trading. <br>
+On top of these basic operations, we can conveniently build our own high level strategies, such as stop-limit order, batch buy/sell, hedging, and quantitative trading. <br>
 
 # Note
 Being a cryptocurrency lover and technology enthusiast, I implemented this cute bot for researching and learning purpose (also for fun ^_^). Using it arbitrarily could be risky, and could potentially lose real money, so be vigilant!<br>
