@@ -1,14 +1,14 @@
-# ![](https://raw.githubusercontent.com/shunjizhan/Coinbot/master/img/eos.png?raw=true)Introduction
+# Introduction
 Coinbot is a cryptocurrency trading bot, which aims to manage accounts across all exchanges, and provide efficient view/trade/monitor/transfer operations, ALL IN ONE PLACE. <br>
 
 On top of these basic operations, we can conveniently build our own high level strategies, such as stop-limit order, batch buy/sell, hedging, and quantitative trading. <br>
 
-# ![](https://raw.githubusercontent.com/shunjizhan/Coinbot/master/img/eos.png?raw=true)Note
+# Note
 Being a cryptocurrency lover and technology enthusiast, I implemented this cute bot for researching and learning purpose (also for fun ^_^). Using it arbitrarily could be risky, and could potentially lose real money, so be vigilant!<br>
 
 If you are looking for a public library with more robust and comprehensive functionality, check [ccxt](https://github.com/ccxt/ccxt) out!
 
-# ![](https://raw.githubusercontent.com/shunjizhan/Coinbot/master/img/eos.png?raw=true)Functionalities
+# Functionalities
 ### Basic
 - view current exchange rate of any token pair in any exchange
 - view quoted depths of any token pair in any exchange
@@ -28,7 +28,7 @@ If you are looking for a public library with more robust and comprehensive funct
 - quantitative trading in any exchange, with customized parameters
 
 
-# ![](https://raw.githubusercontent.com/shunjizhan/Coinbot/master/img/eos.png?raw=true)Supported Exchanges
+# Supported Exchanges
 | Logo     | Exchange     | Location     | Fiat Currency Support | Remark   |
 | :------: | :------: | :------: | :------: |:------: |
 | ![](https://raw.githubusercontent.com/shunjizhan/Coinbot/master/img/gdax.jpg?raw=true) | Coinbase | U.S. | Yes  |    |
@@ -46,7 +46,7 @@ credit: some icons are from ccxt.
 
 
 
-# ![](https://raw.githubusercontent.com/shunjizhan/Coinbot/master/img/eos.png?raw=true)Run
+# Run
 ### import API keys
 in root folder create a `keys.json` with format:
 ```
@@ -99,5 +99,5 @@ in root folder create a `keys.json` with format:
 Makefile only wrapped some most commonly used operations, for other functionalities we can modify the code and call them directly!
 
 
-# ![](https://raw.githubusercontent.com/shunjizhan/Coinbot/master/img/eos.png?raw=true)Author
+# Author
 ![](https://raw.githubusercontent.com/shunjizhan/Coinbot/master/img/bit.png?raw=true) Shunji Zhan
