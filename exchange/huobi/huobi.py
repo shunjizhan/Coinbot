@@ -61,6 +61,7 @@ class Huobi(Exchange):
                 if coinName == 'USDT':
                     coinName = 'USD'
                     BTC_value = num / BTC_price
+                    # print(BTC_value)
                 elif coinName == 'BTC':
                     BTC_value = num
                 else:
@@ -83,10 +84,14 @@ class Huobi(Exchange):
         for coin in balances:
             coinName = coin['currency']
             num = float(coin['balance'])
-            if coinName == 'USDT':
-                coinName = 'USD'
-            if allow_zero or num != 0:
+            # if coinName in {'USDT', 'usdt'}:
+            #     coinName = 'USD'
+            if allow_zero or abs(num) > 1:
                 coins[coinName] += num
+
+        # not mine
+        coins['eos'] -= 3480
+        coins['usdt'] -= 16300
         return dict(coins)
 
     # def market_buy(self, coin, base='BTC', quantity=0):

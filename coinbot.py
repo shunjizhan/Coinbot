@@ -13,11 +13,11 @@ from exchange.huobi.huobi import Huobi
 class Coinbot:
     def __init__(self):
         self.avail_exchanges = {
-            'coinbase',
-            'bittrex',
+            # 'coinbase',
+            # 'bittrex',
             # 'binance',
-            'gate',
-            'bithumb',
+            # 'gate',
+            # 'bithumb',
             'huobi',
             # 'dew'
         }
@@ -41,20 +41,12 @@ class Coinbot:
         self.all_exchanges = {
             'huobi': Huobi(key_huobi['key'], key_huobi['secret']) if self.has_ex('huobi') else None,
             # 'bithumb': Bithumb(key_bithumb['key'], key_bithumb['secret']) if self.has_ex('bithumb') else None,
-            'gate': Gate(key_gate['key'], key_gate['secret']) if self.has_ex('gate') else None,
+            # 'gate': Gate(key_gate['key'], key_gate['secret']) if self.has_ex('gate') else None,
             # 'dew': Dew() if self.has_ex('dew') else None,
             # 'coinbase': Coinbase(key_coinbase['key'], key_coinbase['secret'], key_coinbase['pass']) if self.has_ex('coinbase') else None,
             # 'binance': Binance(key_binance['key'], key_binance['secret']) if self.has_ex('binance') else None,
             # 'bittrex': Bittrex(key_bittrex['key'], key_bittrex['secret']) if self.has_ex('bittrex') else None,
         }
-
-        # self.trading_exchanges = {
-        #     'huobi': self.huobi,
-        #     'gate': self.gate,
-        #     'binance': self.binance,
-        #     'bittrex': self.bittrex,
-        #     'bithumb': self.bithumb,
-        # }
 
         print('')
 
@@ -81,23 +73,29 @@ class Coinbot:
         for ex_name, exchange in self.all_exchanges.items():
             if exchange:
                 coins = exchange.get_full_balance(allow_zero=allow_zero)
+                # pp.pprint(coins)
                 combine_coins(all_coins, coins)
                 p(ex_name + ': '),
                 show_coins(coins)
 
         # add hot wallet EOS
-        tp_eos = 500
+        tp_eos = 300
         tp_usdt = tp_eos * self.all_exchanges['huobi'].get_price('EOS', 'USDT')
         tp_coins = {
             'EOS': {
                 'BTC': tp_usdt / BTC_price,
                 'USD': tp_usdt,
                 'num': tp_eos
-            }
+            },
+            # 'total': {
+            #     'BTC': tp_usdt / BTC_price,
+            #     'USD': tp_usdt,
+            #     'num': tp_eos
+            # }
         }
         combine_coins(all_coins, tp_coins)
-        p('TP' + ': '),
-        show_coins(tp_coins)
+        # p('TP' + ': '),
+        # show_coins(tp_coins)
 
         print('Out:     ' + str(USD_out) + ' 100%'),
 

@@ -67,7 +67,7 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'coins':
         bot.get_all_coin_balance()
     elif sys.argv[1] == 'test':
-        check_ae_in_huobi(bot.all_exchanges['huobi'])
+        print(bot.all_exchanges['huobi'].get_full_balance())
     elif sys.argv[1] == 'run':
         run(bot)
     else:
