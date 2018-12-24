@@ -45,9 +45,10 @@ class Huobi(Exchange):
         TYPES = {0: 'bid', 1: 'ask'}
         pair = self.get_pair(coin, base)
         if pair in self.all_pairs:
-            return float(self.api.get_ticker(symbol=pair)['tick'][TYPES[_type]][0])
-        else:
-            return 0
+            res = self.api.get_ticker(symbol=pair)
+            if (res and res['status'] == 'ok'):
+                return float(res['tick'][TYPES[_type]][0])
+        return 0
 
     def get_full_balance(self, allow_zero=False):
         BTC_price = self.get_BTC_price()
@@ -89,9 +90,14 @@ class Huobi(Exchange):
             if allow_zero or abs(num) > 1:
                 coins[coinName] += num
 
-        # not mine
-        coins['eos'] -= 3480
-        coins['usdt'] -= 16300
+        # # not mine
+        # coins['eos'] -= 3480
+        # coins['eos'] -= 1400
+        # coins['eos'] -= 560
+        # coins['usdt'] -= 16300
+
+        # coins['usdt'] -= 2200
+        # # coins['usdt'] -= 30000  # lastly
         return dict(coins)
 
     # def market_buy(self, coin, base='BTC', quantity=0):

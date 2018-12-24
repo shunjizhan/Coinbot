@@ -103,7 +103,7 @@ class Coinbot:
         show_coins(all_coins, full=full, USD_out=USD_out)
 
         p('Ratio:   ')
-        base = 86800
+        base = 175000
         print(round(all_coins['total']['USD'] / base, 3))
 
     def get_all_coin_balance(self, allow_zero=False):
