@@ -48,7 +48,7 @@ class Huobi(Exchange):
             res = self.api.get_ticker(symbol=pair)
             if (res and res['status'] == 'ok'):
                 return float(res['tick'][TYPES[_type]][0])
-        return 0
+        return 0.0
 
     def get_full_balance(self, allow_zero=False):
         BTC_price = self.get_BTC_price()
@@ -87,7 +87,7 @@ class Huobi(Exchange):
             num = float(coin['balance'])
             # if coinName in {'USDT', 'usdt'}:
             #     coinName = 'USD'
-            if allow_zero or abs(num) > 1:
+            if allow_zero or abs(num) > 0:
                 coins[coinName] += num
 
         # # not mine
@@ -100,46 +100,22 @@ class Huobi(Exchange):
         # # coins['usdt'] -= 30000  # lastly
         return dict(coins)
 
-    # def market_buy(self, coin, base='BTC', quantity=0):
-    #     pair = self.get_pair(coin, base)
-    #     response = self.api.order_market_buy(symbol=pair, quantity=quantity)
-    #     return {
-    #         'exchange': self.name,
-    #         'side': 'sell',
-    #         'pair': self.get_my_pair(coin, base),
-    #         'price': response['price'],
-    #         'quantity': response['executedQty'],
-    #         'total': None,
-    #         'fee': None,
-    #         'id': response['orderId'],
-    #         'id2': response['clientOrderId']
-    #     }
+    def market_buy(self, coin, base='BTC', total_usd=0):
+        pair = self.get_pair(coin, base)
+        res = self.api.send_order(total_usd, '', pair, _type='buy-market', price=0)
+        return res
+        # return {
+        #     'exchange': self.name,
+        #     'side': 'sell',
+        #     'pair': self.get_my_pair(coin, base),
+        #     'price': response['price'],
+        #     'quantity': response['executedQty'],
+        #     'total': None,
+        #     'fee': None,
+        #     'id': response['orderId'],
+        #     'id2': response['clientOrderId']
+        # }
 
-    # def market_sell(self, coin, base='BTC', quantity=0):
-    #     pair = self.get_pair(coin, base)
-    #     response = self.api.order_market_sell(symbol=pair, quantity=quantity)
-    #     return {
-    #         'exchange': self.name,
-    #         'side': 'sell',
-    #         'pair': self.get_my_pair(coin, base),
-    #         'price': response['price'],
-    #         'quantity': response['executedQty'],
-    #         'total': None,
-    #         'fee': None,
-    #         'id': response['orderId'],
-    #         'id2': response['clientOrderId']
-    #     }
-
-    # def market_sell_all(self, coin, base='BTC'):
-    #     quantity = self.get_coin_balance(coin)
-    #     if quantity <= 0:
-    #         print('%s does not have enough balance to sell')
-    #         return None
-    #     else:
-    #         step = self.get_step_size(self.get_pair(coin, base))
-    #         if step > 0 and quantity >= step:
-    #             quantity = quantity - (quantity % float(step))
-    #             return self.market_sell(coin, base=base, quantity=quantity)
 
 
 # ------------------------------------------------------------------ #
@@ -304,7 +280,6 @@ class HuobiAPI:
     def get_balance(self):
         balance = self._get_spot_balance()
         margin_bal = self._get_margin_balance()
-        # pp.pprint(margin_bal)
         balance.extend(margin_bal)
         return balance
 

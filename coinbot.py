@@ -103,7 +103,7 @@ class Coinbot:
         show_coins(all_coins, full=full, USD_out=USD_out)
 
         p('Ratio:   ')
-        base = 175000
+        base = 193000
         print(round(all_coins['total']['USD'] / base, 3))
 
     def get_all_coin_balance(self, allow_zero=False):
@@ -176,55 +176,50 @@ class Coinbot:
     # --------------------------------------------------------------------------------------------- #
     # ----------------------------------------- Trade --------------------------------------------- #
     # --------------------------------------------------------------------------------------------- #
-    def buy_all_bittrex(self, USD_total=200.0):
-        # *** not updated ***
-        dontTouch = self.dontTouch
-        allCoins = self.bittrex.get_balances()['result']
+    def dingtou(self):
+        # check password
+        password = input('enter pass word: ')
+        if not password == 'EOSGOGO':
+            exit('password not correct')
 
-        for coin in allCoins:
-            name = coin['Currency']
-            if (name not in dontTouch):
-                market = 'BTC-' + name
-                ticker = self.bittrex.get_ticker(market)['result']
-                if (ticker is not None and ticker['Ask'] is not None):
-                    price = float(ticker['Ask']) * 1.05
-                    BTC_total = USD_total / self.BTC_price * 1.01
-                    quantity = BTC_total / price
-                    result = self.bittrex.buy_limit(market, quantity, price)
-                    if result is not None and result['result'] is not None:
-                        details = self.bittrex.get_order(result['result']['uuid'])
-                        USD = float(details['result']['Price']) * self.BTC_price
+        # market buy all of the coins
+        huobi = self.all_exchanges['huobi']
+        bases = {
+            "EOS": 2000,
+            "ADA": 750,
+            "AE": 757,
+            "XRP": 500,
+            "BCH": 500,
+            "IOTA": 250,
+            "ONT": 250,
+        }
+        for coin, usd in bases.items():
+            if coin == 'AE':
+                res1 = huobi.market_buy('BTC', 'usdt', usd)
+                btc_num = "%.5f" % (huobi.get_all_coin_balance()['btc'] * 0.99)
+                res2 = huobi.market_buy(coin, 'btc', btc_num)
+                success = (res1['status'] == 'ok' and res2['status'] == 'ok')
+            else:
+                res = huobi.market_buy(coin, 'usdt', usd)
+                success = res['status'] == 'ok'
 
-                        print(name, int(USD)),
-                        # break
+            # print out result
+            if success:
+                print ('bought {} usd of {}'.format(usd, coin))
+            else:
+                print ('bought {} failed!'.format(coin))
 
-    def sell_all_bittrex(self):
-        # *** not updated ***
-        dontTouch = self.dontTouch
-        allCoins = self.bittrex.get_balances()['result']
 
-        count = 0
-        total = 0
-        for coin in allCoins:
-            name = coin['Currency']
-            balance = coin['Balance']
-            if (name not in dontTouch and balance > 0):
-                market = 'BTC-' + name
-                ticker = self.bittrex.get_ticker(market)['result']
-                if (ticker is not None and ticker['Bid'] is not None):
-                    price = float(ticker['Bid']) * 0.95
-                    result = self.bittrex.sell_limit(market, balance, price)
-                    if result is not None and result['result'] is not None:
-                        details = self.bittrex.get_order(result['result']['uuid'])
-                        USD = float(details['result']['Price']) * self.BTC_price
-                        percent = USD / 40.0
 
-                        count += 1
-                        total += USD
 
-                        print(name, int(USD)),
-                        print('%.2f' % percent)
-                        # break
-        print(total, total / count)
+
+
+
+
+
+
+
+
+
 
 

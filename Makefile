@@ -15,6 +15,8 @@ test:
 
 run:
 	python3 main.py run
+tou:
+	python3 main.py tou
 
 install:
 	pip3 install -r requirements.txt 

@@ -67,8 +67,10 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'coins':
         bot.get_all_coin_balance()
     elif sys.argv[1] == 'test':
-        print(bot.all_exchanges['huobi'].get_price('EOS'))
+        print(bot.all_exchanges['huobi'].market_buy('EOS', 'usdt', 1))
     elif sys.argv[1] == 'run':
         run(bot)
+    elif sys.argv[1] == 'tou':
+        bot.dingtou()
     else:
         print('nothing to do...')
