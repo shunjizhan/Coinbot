@@ -1,10 +1,13 @@
+# my files
+gate/gate.json
+keys.json
+.DS_Store
+variables.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-gate/gate.json
-keys.json
-.DS_Store
 
 # C extensions
 *.so

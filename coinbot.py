@@ -54,14 +54,15 @@ class Coinbot:
     # ------------------------------------------ View --------------------------------------------- #
     # --------------------------------------------------------------------------------------------- #
     def get_full_balance(self, full=False, allow_zero=False):
-        # for ex in self.all_exchanges.values():
-        #     if hasattr(ex, 'get_BTC_price'):
-        #         BTC_price = ex.get_BTC_price()
-        # assert(BTC_price)
+        # read all private variables
+        with open('variables.json') as f:
+            variables = json.load(f)
 
+        # get BTC price for future use
         BTC_price = self.all_exchanges['huobi'].get_BTC_price()
 
-        USD_out = 2000 + 8888 + 8338 + 4548 + 2034 + 5248 + 1099 + 3758
+        # cashed out amount
+        USD_out = sum(variables['usd_out'])
         all_coins = {
             'total': {
                 'BTC': USD_out / BTC_price,
@@ -70,6 +71,7 @@ class Coinbot:
             }
         }
 
+        # coins in all exchanges
         for ex_name, exchange in self.all_exchanges.items():
             if exchange:
                 coins = exchange.get_full_balance(allow_zero=allow_zero)
@@ -78,8 +80,8 @@ class Coinbot:
                 p(ex_name + ': '),
                 show_coins(coins)
 
-        # add hot wallet EOS
-        tp_eos = 300
+        # hot wallet EOS
+        tp_eos = variables['tp_eos']
         tp_usdt = tp_eos * self.all_exchanges['huobi'].get_price('EOS', 'USDT')
         tp_coins = {
             'EOS': {
@@ -87,11 +89,6 @@ class Coinbot:
                 'USD': tp_usdt,
                 'num': tp_eos
             },
-            # 'total': {
-            #     'BTC': tp_usdt / BTC_price,
-            #     'USD': tp_usdt,
-            #     'num': tp_eos
-            # }
         }
         combine_coins(all_coins, tp_coins)
         # p('TP' + ': '),
@@ -103,7 +100,7 @@ class Coinbot:
         show_coins(all_coins, full=full, USD_out=USD_out)
 
         p('Ratio:   ')
-        base = 193000
+        base = variables['base']
         print(round(all_coins['total']['USD'] / base, 3))
 
     def get_all_coin_balance(self, allow_zero=False):
