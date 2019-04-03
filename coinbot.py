@@ -44,7 +44,7 @@ class Coinbot:
             # 'gate': Gate(key_gate['key'], key_gate['secret']) if self.has_ex('gate') else None,
             # 'dew': Dew() if self.has_ex('dew') else None,
             # 'coinbase': Coinbase(key_coinbase['key'], key_coinbase['secret'], key_coinbase['pass']) if self.has_ex('coinbase') else None,
-            # 'binance': Binance(key_binance['key'], key_binance['secret']) if self.has_ex('binance') else None,
+            'binance': Binance(key_binance['key'], key_binance['secret']) if self.has_ex('binance') else None,
             # 'bittrex': Bittrex(key_bittrex['key'], key_bittrex['secret']) if self.has_ex('bittrex') else None,
         }
 
@@ -182,27 +182,23 @@ class Coinbot:
         # market buy all of the coins
         huobi = self.all_exchanges['huobi']
         bases = {
-            "EOS": 2000,
             "ADA": 750,
-            "AE": 757,
+            "AE": 750,
             "XRP": 500,
             "BCH": 500,
-            "IOTA": 250,
-            "ONT": 250,
+            "HT": 500,
+            "ONT": 250
         }
         for coin, usd in bases.items():
-            if coin == 'AE':
-                res1 = huobi.market_buy('BTC', 'usdt', usd)
-                btc_num = "%.5f" % (huobi.get_all_coin_balance()['btc'] * 0.99)
-                res2 = huobi.market_buy(coin, 'btc', btc_num)
-                success = (res1['status'] == 'ok' and res2['status'] == 'ok')
-            else:
-                res = huobi.market_buy(coin, 'usdt', usd)
-                success = res['status'] == 'ok'
+            res = huobi.market_buy(coin, 'usdt', usd)
+            success = res['status'] == 'ok'
 
             # print out result
             if success:
-                print ('bought {} usd of {}'.format(usd, coin))
+                order_id = res['data']
+                info = huobi.get_order_info(order_id)['data']
+                price = float(info['field-cash-amount']) / float(info['field-amount'])
+                print ('bought {} usd of {}, price: {}'.format(usd, coin, price))
             else:
                 print ('bought {} failed!'.format(coin))
 

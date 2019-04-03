@@ -100,6 +100,9 @@ class Huobi(Exchange):
         # # coins['usdt'] -= 30000  # lastly
         return dict(coins)
 
+    def get_order_info(self, order_id):
+        return self.api.order_info(order_id)
+
     def market_buy(self, coin, base='BTC', total_usd=0):
         pair = self.get_pair(coin, base)
         res = self.api.send_order(total_usd, '', pair, _type='buy-market', price=0)
