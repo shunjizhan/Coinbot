@@ -182,12 +182,13 @@ class Coinbot:
         # market buy all of the coins
         huobi = self.all_exchanges['huobi']
         bases = {
-            "ADA": 750,
-            "AE": 750,
-            "XRP": 500,
+            "EOS": 800,
+            "ADA": 500,
             "BCH": 500,
-            "HT": 500,
-            "ONT": 250
+            "AE": 300,
+            "XRP": 300,
+            "HT": 300,
+            "ONT": 300
         }
         for coin, usd in bases.items():
             res = huobi.market_buy(coin, 'usdt', usd)

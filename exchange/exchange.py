@@ -6,7 +6,7 @@ class Exchange:
         self.dontTouch = {'XRP', 'XEM', 'BTC', 'DOGE', 'SC', 'NEO', 'ZEC', 'BTG', 'MONA', 'WINGS', 'USDT', 'IOTA', 'EOS', 'QTUM', 'ADA', 'XLM', 'LSK', 'BTS', 'XMR', 'DASH', 'SNT', 'BCC', 'BCH', 'SBTC', 'BCX', 'ETF', 'LTC', 'ETH', 'BNB', 'ADA', 'BTS', 'SNT'}
 
     def connect_success(self):
-        print('connected %s' % self.name)
+        print('connected %s ✔️' % self.name)
 
     def get_pair(self, coin, base):
         # return the specific pair format for this exchange

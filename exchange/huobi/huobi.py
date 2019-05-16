@@ -2,16 +2,18 @@ import datetime
 import urllib
 import urllib.parse
 import urllib.request
-import pprint as pp
+from pprint import pprint
 
 from collections import defaultdict
 from .utils import createSign, http_get_request, http_post_request
 from ..exchange import Exchange
+from .HuobiDMService import HuobiDM
 
 
 class Huobi(Exchange):
     def __init__(self, key, secret):
         self.api = HuobiAPI(key, secret)
+        self.contract_api = HuobiDM(key, secret)
         self.all_pairs = self.get_all_trading_pairs()
         super().__init__('huobi')
         self.connect_success()
@@ -51,15 +53,24 @@ class Huobi(Exchange):
         return 0.0
 
     def get_full_balance(self, allow_zero=False):
+        print('calculating balance ...')
+
         BTC_price = self.get_BTC_price()
         coins = {
             'total': {'BTC': 0, 'USD': 0, 'num': 0},
             'USD': {'BTC': 0, 'USD': 0, 'num': 0}
         }
+
+        # these variables are for displaying process info
+        coin_count = len(self.coins)
+        interval = int(coin_count / 5)
+        next_target = interval
+        calculated = 0
+
         for coinName, num in self.coins.items():
             coinName = coinName.upper()
             if allow_zero or num != 0:
-                if coinName == 'USDT':
+                if coinName.lower() in {'usd', 'usdt'}:
                     coinName = 'USD'
                     BTC_value = num / BTC_price
                     # print(BTC_value)
@@ -70,18 +81,34 @@ class Huobi(Exchange):
                 USD_value = BTC_value * BTC_price
 
                 # update info
-                coins[coinName] = {
-                    'num': num,
-                    'BTC': BTC_value,
-                    'USD': USD_value
-                }
+                if coinName in coins:
+                    coins[coinName]['num'] += num
+                    coins[coinName]['BTC'] += BTC_value
+                    coins[coinName]['USD'] += USD_value
+                else:
+                    coins[coinName] = {
+                        'num': num,
+                        'BTC': BTC_value,
+                        'USD': USD_value
+                    }
                 coins['total']['BTC'] += BTC_value
                 coins['total']['USD'] += USD_value
+
+            # print some info
+            calculated += 1
+            if calculated == next_target:
+                percent_finished = next_target / coin_count * 100
+                print('%.1f ...' % percent_finished)
+                next_target += interval    # next perent target
+
+        print('calculated all balance ✔️\n')
         return coins
 
     def get_all_coin_balance(self, allow_zero=False):
-        balances = self.api.get_balance()
         coins = defaultdict(float)
+
+        # 现货和杠杆账户
+        balances = self.api.get_balance()
         for coin in balances:
             coinName = coin['currency']
             num = float(coin['balance'])
@@ -90,15 +117,44 @@ class Huobi(Exchange):
             if allow_zero or abs(num) > 0:
                 coins[coinName] += num
 
-        # # not mine
-        # coins['eos'] -= 3480
-        # coins['eos'] -= 1400
-        # coins['eos'] -= 560
-        # coins['usdt'] -= 16300
+        # 合约账户
+        contract_bal = self._get_contract_balance()
+        for coin, num in contract_bal.items():
+            coins[coin.lower()] += num
 
-        # coins['usdt'] -= 2200
-        # # coins['usdt'] -= 30000  # lastly
+        print('got all coins balance ✔️')
         return dict(coins)
+
+    # 合约的balance
+    def _get_contract_balance(self):  
+        res = defaultdict(int)
+        all_balances = self.contract_api.get_contract_account_info()['data']
+        for balance in all_balances:
+            coin = balance['symbol']
+            num = balance['margin_balance']    # 所有现货
+            if num > 0:
+                res[coin] += num
+
+        contract_bal = self.contract_api.get_contract_position_info()['data']
+        for pos in contract_bal:
+            coin = pos['symbol']
+            direction = pos['direction']
+
+            volume = pos['volume']
+            position_margin = pos['position_margin']
+            lever_rate = pos['lever_rate']
+            # profit = pos['profit']
+
+            num = position_margin * lever_rate              # 持有的币（杠杆多出来那一部分，不用加profit，因为已经算进账户权益里面了）
+            vol = volume * 10                               # 1 volume = 10 USD
+            if direction == 'buy':                          # 多单加了币，少了钱              
+                res[coin] += num
+                res['USD'] -= vol
+            else:                                           # 空单多了钱，少了币
+                res[coin] -= num
+                res['USD'] += vol
+
+        return dict(res)
 
     def get_order_info(self, order_id):
         return self.api.order_info(order_id)
