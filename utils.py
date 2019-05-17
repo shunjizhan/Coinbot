@@ -9,7 +9,7 @@ def p(*args):
         sys.stdout.write(x + ' ')
 
 
-def show_coins(coins, full=False, USD_out=0):
+def show_coins(coins, full=False, USD_out=0, EOS_value=0):
     '''
     print coins dict with format {
         coinName1: {
@@ -39,11 +39,15 @@ def show_coins(coins, full=False, USD_out=0):
 
     # 仓位
     if coins['total']['USD'] > 0:
-        cash_ratio = round(coins['USD']['USD'] * 100.0 / (coins['total']['USD'] - USD_out), 1)
+        cash = coins['USD']['USD']
+        real_balance = coins['total']['USD'] - USD_out      # real_balance = total_balance - USD_out
+        cash_ratio = round(cash * 100.0 / real_balance, 1)
+        cash_ratio_without_EOS = round(cash * 100.0 / (real_balance - EOS_value), 1)
     else:
         cash_ratio = 0
     coin_ratio = str(100 - cash_ratio)
-    print(coin_ratio + '%')
+    coin_ratio_without_EOS = str(100 - cash_ratio_without_EOS)
+    print(coin_ratio + '%', '|', coin_ratio_without_EOS + '%')
 
 
 def combine_coins(d1, d2):

@@ -72,13 +72,18 @@ class Coinbot:
         }
 
         # coins in all exchanges
+        EOS_price = self.all_exchanges['huobi'].get_price('EOS', 'USDT')
+        EOS_value = EOS_price * 10000
         for ex_name, exchange in self.all_exchanges.items():
             if exchange:
                 coins = exchange.get_full_balance(allow_zero=allow_zero)
                 # pp.pprint(coins)
                 combine_coins(all_coins, coins)
                 p(ex_name + ': '),
-                show_coins(coins)
+                if ex_name == 'huobi':
+                    show_coins(coins, EOS_value=EOS_value)
+                else:
+                    show_coins(coins, EOS_value=0)
 
         # hot wallet EOS
         tp_eos = variables['tp_eos']
@@ -97,7 +102,7 @@ class Coinbot:
         print('Out:     ' + str(USD_out) + ' 100%'),
 
         p('Total:   '),
-        show_coins(all_coins, full=full, USD_out=USD_out)
+        show_coins(all_coins, full=full, USD_out=USD_out, EOS_value=EOS_value)
 
         p('Ratio:   ')
         base = variables['base']

@@ -66,6 +66,7 @@ class Huobi(Exchange):
         interval = int(coin_count / 5)
         next_target = interval
         calculated = 0
+        percent_finished = 20
 
         for coinName, num in self.coins.items():
             coinName = coinName.upper()
@@ -97,9 +98,9 @@ class Huobi(Exchange):
             # print some info
             calculated += 1
             if calculated == next_target:
-                percent_finished = next_target / coin_count * 100
-                print('%.1f ...' % percent_finished)
+                print(str(percent_finished) + '% ...')
                 next_target += interval    # next perent target
+                percent_finished += 20
 
         print('calculated all balance ✔️\n')
         return coins
