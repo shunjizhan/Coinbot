@@ -1,6 +1,8 @@
 import sys
 import requests
+from copy import deepcopy
 import pprint as pp
+
 
 def p(*args):
     for x in args:
@@ -9,7 +11,7 @@ def p(*args):
         sys.stdout.write(x + ' ')
 
 
-def show_coins(coins, full=False, USD_out=0, EOS_value=0):
+def show_coins(coins, full=False, USD_out=0, fixed_coins={}):
     '''
     print coins dict with format {
         coinName1: {
@@ -20,6 +22,29 @@ def show_coins(coins, full=False, USD_out=0, EOS_value=0):
         coinName2: {} ...
     }
     '''
+
+    coins = deepcopy(coins)
+
+    # first need to deduct fixed coins from coins
+    for coin, num in fixed_coins.items():
+        assert(coin in coins)
+
+        # calculate values to be deducted
+        coin_info = coins[coin]
+        deducted_ratio = (num / coin_info['num'])
+        deducted_USD = coin_info['USD'] * deducted_ratio
+        deducted_BTC = coin_info['BTC'] * deducted_ratio
+
+        # deduct this coin num and value
+        coin_info['num'] -= num
+        coin_info['USD'] -= deducted_USD
+        coin_info['BTC'] -= deducted_BTC
+
+        # deduct total coin num and value
+        coin_info = coins['total']
+        coin_info['USD'] -= deducted_USD
+        coin_info['BTC'] -= deducted_BTC
+
     for coinName, info in coins.items():
         info['BTC'] = round(info['BTC'], 2)
         info['USD'] = int(info['USD'])
@@ -32,7 +57,7 @@ def show_coins(coins, full=False, USD_out=0, EOS_value=0):
         coinslist = sorted(coins.items(), key=lambda kv: kv[1]['USD'], reverse=True)
         for coin, info in coinslist:
             if info['BTC'] != 0:
-                info['ratio'] = round(info['USD'] * 100.0 / total_USD, 1)
+                info['ratio'] = round(info['USD'] * 100.0 / (total_USD - USD_out), 1)
                 print(coin, info)
     else:
         p(coins['total']['USD'])
@@ -42,12 +67,11 @@ def show_coins(coins, full=False, USD_out=0, EOS_value=0):
         cash = coins['USD']['USD']
         real_balance = coins['total']['USD'] - USD_out      # real_balance = total_balance - USD_out
         cash_ratio = round(cash * 100.0 / real_balance, 1)
-        cash_ratio_without_EOS = round(cash * 100.0 / (real_balance - EOS_value), 1)
     else:
         cash_ratio = 0
     coin_ratio = str(100 - cash_ratio)
-    coin_ratio_without_EOS = str(100 - cash_ratio_without_EOS)
-    print(coin_ratio + '%', '|', coin_ratio_without_EOS + '%')
+    print(coin_ratio + '%')
+    print('-' * 70)
 
 
 def combine_coins(d1, d2):
