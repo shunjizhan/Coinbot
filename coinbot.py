@@ -83,16 +83,16 @@ class Coinbot:
         # hot wallet EOS
         tp_eos = variables['tp_eos']
         tp_usdt = tp_eos * self.all_exchanges['huobi'].get_price('EOS', 'USDT')
-        tp_coins = {
+        other_coins = {
             'EOS': {
                 'BTC': tp_usdt / BTC_price,
                 'USD': tp_usdt,
                 'num': tp_eos
             },
         }
-        combine_coins(all_coins, tp_coins)
+        combine_coins(all_coins, other_coins)
         # p('TP' + ': '),
-        # show_coins(tp_coins)
+        # show_coins(other_coins)
 
         print('Out:     ' + str(USD_out) + ' 100%'),
 
@@ -101,6 +101,7 @@ class Coinbot:
 
         # p('Total Except Fixed:   '),
         fixed_coins = variables['fixed_coins']
+        fixed_coins['EOS'] += other_coins['EOS']['num']        # tp eos is also long term
         show_coins(all_coins, full=full, USD_out=USD_out, fixed_coins=fixed_coins)
 
         p('Ratio:   ')
