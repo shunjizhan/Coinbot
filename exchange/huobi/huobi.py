@@ -147,7 +147,10 @@ class Huobi(Exchange):
             # profit = pos['profit']
 
             num = position_margin * lever_rate              # 持有的币（杠杆多出来那一部分，不用加profit，因为已经算进账户权益里面了）
-            vol = volume * 10                               # 1 volume = 10 USD
+            if coin == 'BTC':
+                vol = volume * 100                          # 1 volume = 100 USD for BTC
+            else:
+                vol = volume * 10                           # 1 volume = 10 USD for all others
             if direction == 'buy':                          # 多单加了币，少了钱              
                 res[coin] += num
                 res['USD'] -= vol
