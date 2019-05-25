@@ -1,7 +1,12 @@
 import json
+from pandas import DataFrame
 from pprint import pprint
 from binance import Binance
 from datetime import datetime
+
+
+def timestamp_to_real_time(ts):
+    return datetime.utcfromtimestamp(ts / 1000).strftime('%Y-%m-%d %H:%M:%S')
 
 
 def get_profit_details(coin):
@@ -18,7 +23,7 @@ def get_profit_details(coin):
         side = order['side']
         price = float(order['price'])
         num = float(order['executedQty'])
-        time = datetime.utcfromtimestamp(int(order['time']) / 1000).strftime('%Y-%m-%d %H:%M:%S')
+        time = int(order['time'])
 
         if side == 'BUY':
             position = {
@@ -29,7 +34,7 @@ def get_profit_details(coin):
         else:
             buy_time = position['buy_time']
             buy_price = position['buy_price']
-            profit = price - position['buy_price']
+            profit = float(price - position['buy_price'])
             cur_trade = {
                 'coin_name': coin_name,
                 'buy_time': buy_time,
@@ -43,6 +48,18 @@ def get_profit_details(coin):
             all_trades.append(cur_trade)
 
     return all_trades
+
+
+def convert_to_panda_readable(all_trades, columns):
+    res = {}
+    for p in columns:
+        res[p] = []
+
+    for trade in all_trades:
+        for p in columns:
+            res[p].append(trade[p])
+
+    return res
 
 
 if __name__ == '__main__':
@@ -74,7 +91,34 @@ if __name__ == '__main__':
             print(str(int(target * 100)) + '%')
             target += 0.1
 
-    pprint(all_trades)
+    # sort by sell time
+    all_trades = sorted(all_trades, key=lambda x: x['sell_time'])
+
+    # convert time stamp to be readable
+    def _convert_timestamp(x):
+        x['sell_time'] = timestamp_to_real_time(x['sell_time'])
+        x['buy_time'] = timestamp_to_real_time(x['buy_time'])
+        return x
+
+    all_trades = map(_convert_timestamp, all_trades)
+
+    # convert to panda data frame
+    columns = [
+        'coin_name',
+        'buy_time',
+        'sell_time',
+        'buy_price',
+        'sell_price',
+        'num',
+        'profit',
+        'profit_rate'
+    ]
+    all_trades = convert_to_panda_readable(all_trades, columns)
+    df = DataFrame(all_trades)
+    print('finished! => results.csv\n' + '-' * 50)
+
+    # write to results
+    df.to_csv('results.csv', columns=columns)
 
 
 

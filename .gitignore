@@ -3,6 +3,7 @@ gate/gate.json
 keys.json
 .DS_Store
 variables.json
+results.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
