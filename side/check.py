@@ -63,7 +63,7 @@ def convert_to_panda_readable(all_trades, columns):
 
 
 if __name__ == '__main__':
-    with open('../keys.json') as key_file:
+    with open('keys.json') as key_file:
         keys = json.load(key_file)
         key_binance = keys['binance2']
 

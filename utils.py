@@ -1,7 +1,7 @@
 import sys
 import requests
 from copy import deepcopy
-import pprint as pp
+from pprint import pprint
 
 
 def p(*args):
@@ -45,6 +45,7 @@ def show_coins(coins, full=False, USD_out=0, fixed_coins={}):
         coin_info['USD'] -= deducted_USD
         coin_info['BTC'] -= deducted_BTC
 
+    # do some rounding
     for coinName, info in coins.items():
         info['BTC'] = round(info['BTC'], 2)
         info['USD'] = int(info['USD'])
@@ -63,7 +64,7 @@ def show_coins(coins, full=False, USD_out=0, fixed_coins={}):
         p(coins['total']['USD'])
 
     # 仓位
-    if coins['total']['USD'] > 0:
+    if (coins['total']['USD'] > 0) and ('USD' in coins):
         cash = coins['USD']['USD']
         real_balance = coins['total']['USD'] - USD_out      # real_balance = total_balance - USD_out
         cash_ratio = round(cash * 100.0 / real_balance, 1)
@@ -85,12 +86,14 @@ def combine_coins(d1, d2):
         coinName2: {} ...
     }
     '''
+    d1, d2 = deepcopy(d1), deepcopy(d2)
     for coin, info in d2.items():
         if coin in d1:
             for attribute in d1[coin]:
                 d1[coin][attribute] += info[attribute]
         else:
             d1[coin] = info
+
     return d1
 
 
@@ -118,12 +121,12 @@ def get_rate(currency, base):
     # *** this needs update
     key = '97d6041822759bd2b86a1f153329ed78'
     url = 'https://api.fixer.io/latest?access_key=%s&base=%s' % (key, base)
-    pp.pprint (requests.get(url).json())
+    pprint (requests.get(url).json())
     return requests.get(url).json()['rates'][currency]
 
 
 if __name__ == '__main__':
-    pp.pprint(get_rate('krw','usd'))
+    pprint(get_rate('krw','usd'))
 
 
 

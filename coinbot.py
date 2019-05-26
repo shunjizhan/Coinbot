@@ -1,5 +1,7 @@
-import pprint as pp
 import json
+from pprint import pprint
+from copy import deepcopy
+
 from utils import p, show_coins, combine_coins, combine_markets
 from exchange.bittrex.bittrex import Bittrex
 from exchange.coinbase.coinbase import Coinbase
@@ -15,7 +17,7 @@ class Coinbot:
         self.avail_exchanges = {
             # 'coinbase',
             # 'bittrex',
-            # 'binance',
+            'binance',
             # 'gate',
             # 'bithumb',
             'huobi',
@@ -58,12 +60,14 @@ class Coinbot:
         with open('variables.json') as f:
             variables = json.load(f)
 
-        # get BTC price for future use
-        BTC_price = self.all_exchanges['huobi'].get_BTC_price()
+        # get BTC and EOS price for future use
+        huobi = self.all_exchanges['huobi']
+        BTC_price = huobi.get_BTC_price()
+        EOS_price = huobi.get_price('EOS', 'USDT')
 
-        # cashed out amount
+        # get cashed out amount
         USD_out = sum(variables['usd_out'])
-        all_coins = {
+        out_coins = {
             'total': {
                 'BTC': USD_out / BTC_price,
                 'USD': USD_out,
@@ -71,45 +75,55 @@ class Coinbot:
             }
         }
 
-        # coins in all exchanges
+        # combine coins in all exchanges
+        all_coins = deepcopy(out_coins)
         for ex_name, exchange in self.all_exchanges.items():
             if exchange:
                 coins = exchange.get_full_balance(allow_zero=allow_zero)
-                # pp.pprint(coins)
-                combine_coins(all_coins, coins)
-                p(ex_name + ': '),
+                # pprint(coins)
+                all_coins = combine_coins(all_coins, coins)
+                p('[' + ex_name + '] => '),
                 show_coins(coins)
 
-        # hot wallet EOS
+        # other long term coins
         tp_eos = variables['tp_eos']
-        tp_usdt = tp_eos * self.all_exchanges['huobi'].get_price('EOS', 'USDT')
+        tp_usdt = tp_eos * EOS_price
         other_coins = {
             'EOS': {
                 'BTC': tp_usdt / BTC_price,
                 'USD': tp_usdt,
                 'num': tp_eos
             },
+            'total': {
+                'BTC': tp_usdt / BTC_price,
+                'USD': tp_usdt,
+                'num': 0
+            },
         }
-        combine_coins(all_coins, other_coins)
-        # p('TP' + ': '),
-        # show_coins(other_coins)
 
-        print('Out:     ' + str(USD_out) + ' 100%'),
+        # print out cash out amount
+        p('[Cash Out] =>'),
+        show_coins(out_coins)
 
-        # p('Total:   '),
+        # add other long term coins
+        all_coins = combine_coins(all_coins, other_coins)
+
+        print('[Total Long Term] =>')
         show_coins(all_coins, full=full, USD_out=USD_out)
 
-        # p('Total Except Fixed:   '),
+        # calculate short term coins
+        print('[Total Short Term] =>')
         fixed_coins = variables['fixed_coins']
-        fixed_coins['EOS'] += other_coins['EOS']['num']        # tp eos is also long term
+        fixed_coins['EOS'] += tp_eos    # other coins is also long term
         show_coins(all_coins, full=full, USD_out=USD_out, fixed_coins=fixed_coins)
 
+        # profit calculation
         p('Ratio:   ')
         base = variables['base']
         print(round(all_coins['total']['USD'] / base, 3))
 
     def get_all_coin_balance(self, allow_zero=False):
-        pp.pprint(self.all_exchanges)
+        pprint(self.all_exchanges)
         for ex_name, exchange in self.all_exchanges.items():
             coins = exchange.get_all_coin_balance(allow_zero)
             print('--------------------------')
@@ -123,7 +137,7 @@ class Coinbot:
                 all_markets,
                 exchange.get_trading_pairs()
             )
-        pp.pprint(all_markets)
+        pprint(all_markets)
 
         while True:
             print('----------------------------------------')
