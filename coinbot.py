@@ -198,18 +198,13 @@ class Coinbot:
         if not password == 'EOSGOGO':
             exit('password not correct')
 
+        # get the ding tou bases
+        with open('variables.json') as f:
+            variables = json.load(f)
+        bases = variables['ding_tou_bases']
+
         # market buy all of the coins
         huobi = self.all_exchanges['huobi']
-        bases = {
-            "EOS": 400,
-            "ADA": 300,
-            "BCH": 300,
-            "AE": 200,
-            "XRP": 200,
-            "HT": 200,
-            "ONT": 200,
-            "ATOM": 200
-        },
         for coin, usd in bases.items():
             res = huobi.market_buy(coin, 'usdt', usd)
             success = res['status'] == 'ok'
