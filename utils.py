@@ -66,12 +66,18 @@ def show_coins(coins, full=False, USD_out=0, fixed_coins={}):
     # 仓位
     if (coins['total']['USD'] > 0) and ('USD' in coins):
         cash = coins['USD']['USD']
-        real_balance = coins['total']['USD'] - USD_out      # real_balance = total_balance - USD_out
-        cash_ratio = round(cash * 100.0 / real_balance, 1)
+        real_base = coins['total']['USD'] - USD_out      # real_base = total_balance - USD_out
+        cash_ratio = round(cash * 100.0 / real_base, 1)
     else:
+        cash = 0
+        real_base = 0
         cash_ratio = 0
-    coin_ratio = str(100 - cash_ratio)
-    print(coin_ratio + '%')
+
+    cang_wei = str(100 - cash_ratio)                            # 仓位
+    total_balance = str(round((real_base - cash) / 10000, 2))   # 所有现货+合约
+    real_base = str(round(real_base / 10000, 2))                # 所有本金
+
+    print(cang_wei + '%  ' + '[' + total_balance + '/' + real_base + ']')
     print('-' * 70)
 
 

@@ -201,14 +201,15 @@ class Coinbot:
         # market buy all of the coins
         huobi = self.all_exchanges['huobi']
         bases = {
-            "EOS": 800,
-            "ADA": 500,
-            "BCH": 500,
-            "AE": 300,
-            "XRP": 300,
-            "HT": 300,
-            "ONT": 300
-        }
+            "EOS": 400,
+            "ADA": 300,
+            "BCH": 300,
+            "AE": 200,
+            "XRP": 200,
+            "HT": 200,
+            "ONT": 200,
+            "ATOM": 200
+        },
         for coin, usd in bases.items():
             res = huobi.market_buy(coin, 'usdt', usd)
             success = res['status'] == 'ok'
