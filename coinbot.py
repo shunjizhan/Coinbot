@@ -18,7 +18,7 @@ class Coinbot:
             # 'coinbase',
             # 'bittrex',
             'binance',
-            # 'gate',
+            'gate',
             # 'bithumb',
             'huobi',
             # 'dew'
@@ -43,7 +43,7 @@ class Coinbot:
         self.all_exchanges = {
             'huobi': Huobi(key_huobi['key'], key_huobi['secret']) if self.has_ex('huobi') else None,
             # 'bithumb': Bithumb(key_bithumb['key'], key_bithumb['secret']) if self.has_ex('bithumb') else None,
-            # 'gate': Gate(key_gate['key'], key_gate['secret']) if self.has_ex('gate') else None,
+            'gate': Gate(key_gate['key'], key_gate['secret']) if self.has_ex('gate') else None,
             # 'dew': Dew() if self.has_ex('dew') else None,
             # 'coinbase': Coinbase(key_coinbase['key'], key_coinbase['secret'], key_coinbase['pass']) if self.has_ex('coinbase') else None,
             'binance': Binance(key_binance['key'], key_binance['secret']) if self.has_ex('binance') else None,
@@ -86,7 +86,9 @@ class Coinbot:
                 show_coins(coins)
 
         # other long term coins
-        tp_eos = variables['tp_eos']
+        tp_eos_short = variables['tp_eos_short']
+        tp_eos_long = variables['tp_eos_long']
+        tp_eos = tp_eos_short + tp_eos_long
         tp_usdt = tp_eos * EOS_price
         other_coins = {
             'EOS': {
@@ -114,7 +116,7 @@ class Coinbot:
         # calculate short term coins
         print('[Total Short Term] =>')
         fixed_coins = variables['fixed_coins']
-        fixed_coins['EOS'] += tp_eos    # other coins is also long term
+        fixed_coins['EOS'] += tp_eos_long           # long term tp_eos
         show_coins(all_coins, full=full, USD_out=USD_out, fixed_coins=fixed_coins)
 
         # profit calculation

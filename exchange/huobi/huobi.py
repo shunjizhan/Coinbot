@@ -2,6 +2,7 @@ import datetime
 import urllib
 import urllib.parse
 import urllib.request
+import json
 from pprint import pprint
 
 from collections import defaultdict
@@ -121,6 +122,13 @@ class Huobi(Exchange):
         # 合约账户
         contract_bal = self._get_contract_balance()
         for coin, num in contract_bal.items():
+            coins[coin.lower()] += num
+
+        # 矿池
+        with open('variables.json') as f:
+            variables = json.load(f)
+        pool_coins = variables['pool_coins']
+        for coin, num in pool_coins.items():
             coins[coin.lower()] += num
 
         print('got all coins balance ✔️')

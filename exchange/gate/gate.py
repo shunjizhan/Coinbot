@@ -81,7 +81,7 @@ class Gate(Exchange):
         balances = json.loads(self.api.balances())
         # print (balances)
         balances_avail, balances_lock = balances['available'], balances['locked']
-        coins = {}
+        coins = defaultdict(int)
         for coinName in balances_avail:
             num = float(balances_avail[coinName])
             if coinName == 'USDT':
