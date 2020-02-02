@@ -10,11 +10,14 @@ from .utils import createSign, http_get_request, http_post_request
 from ..exchange import Exchange
 from .HuobiDMService import HuobiDM
 
+from ..coin_market_cap import CoinMarketCap
+
 
 class Huobi(Exchange):
     def __init__(self, key, secret):
         self.api = HuobiAPI(key, secret)
         self.contract_api = HuobiDM(key, secret)
+        self.cmc = CoinMarketCap()
         self.all_pairs = self.get_all_trading_pairs()
         super().__init__('huobi')
         self.connect_success()
@@ -45,6 +48,9 @@ class Huobi(Exchange):
         return self.get_price('BTC', base='USDT')
 
     def get_price(self, coin, base='BTC', _type=0):
+        if (coin == 'PCX' or coin == 'BNB'):
+            return self.cmc.get_price(coin) / self.get_BTC_price()
+
         TYPES = {0: 'bid', 1: 'ask'}
         pair = self.get_pair(coin, base)
         if pair in self.all_pairs:

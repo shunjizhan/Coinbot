@@ -41,6 +41,8 @@ class Dew(Exchange):
 # --------------------------- API Wrapper -------------------------- #
 # ------------------------------------------------------------------ #
 class Cmk:
+
+    ### THIS IS DEPRECATED!!! USE exchange/coin_market_cap instead
     def __init__(self):
         self.base_url = 'https://api.coinmarketcap.com/v1/'
 
