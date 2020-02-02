@@ -17,8 +17,8 @@ class Coinbot:
         self.avail_exchanges = {
             # 'coinbase',
             # 'bittrex',
-            'binance',
-            'gate',
+            # 'binance',
+            # 'gate',
             # 'bithumb',
             'huobi',
             # 'dew'
@@ -43,10 +43,10 @@ class Coinbot:
         self.all_exchanges = {
             'huobi': Huobi(key_huobi['key'], key_huobi['secret']) if self.has_ex('huobi') else None,
             # 'bithumb': Bithumb(key_bithumb['key'], key_bithumb['secret']) if self.has_ex('bithumb') else None,
-            'gate': Gate(key_gate['key'], key_gate['secret']) if self.has_ex('gate') else None,
+            # 'gate': Gate(key_gate['key'], key_gate['secret']) if self.has_ex('gate') else None,
             # 'dew': Dew() if self.has_ex('dew') else None,
             # 'coinbase': Coinbase(key_coinbase['key'], key_coinbase['secret'], key_coinbase['pass']) if self.has_ex('coinbase') else None,
-            'binance': Binance(key_binance['key'], key_binance['secret']) if self.has_ex('binance') else None,
+            # 'binance': Binance(key_binance['key'], key_binance['secret']) if self.has_ex('binance') else None,
             # 'bittrex': Bittrex(key_bittrex['key'], key_bittrex['secret']) if self.has_ex('bittrex') else None,
         }
 
