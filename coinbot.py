@@ -115,8 +115,9 @@ class Coinbot:
         print('[Total All] =>')
         show_coins(all_coins, full=full)
 
-        # print('[Total Long Term] =>')
-        # show_coins(fixed_coins, full=full)
+        print('[Total Long Term] =>')
+        fixed_coins_full_data = huobi.get_full_balance_with_raw_coin_data(fixed_coins, print_info=False)
+        show_coins(fixed_coins_full_data, full=full)
 
         # calculate short term coins
         print('[Total Short Term] =>')

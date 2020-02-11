@@ -60,7 +60,11 @@ class Huobi(Exchange):
         return 0.0
 
     def get_full_balance(self, allow_zero=False):
-        print('calculating balance ...')
+        return self.get_full_balance_with_raw_coin_data(self.coins, allow_zero)
+
+    def get_full_balance_with_raw_coin_data(self, coins_raw, allow_zero=False, print_info=True):
+        if print_info:
+            print('calculating balance ...')
 
         BTC_price = self.get_BTC_price()
         coins = {
@@ -69,13 +73,13 @@ class Huobi(Exchange):
         }
 
         # these variables are for displaying process info
-        coin_count = len(self.coins)
+        coin_count = len(coins_raw)
         interval = int(coin_count / 5)
         next_target = interval
         calculated = 0
         percent_finished = 20
 
-        for coinName, num in self.coins.items():
+        for coinName, num in coins_raw.items():
             coinName = coinName.upper()
             if allow_zero or num != 0:
                 if coinName.lower() in {'usd', 'usdt'}:
@@ -103,13 +107,15 @@ class Huobi(Exchange):
                 coins['total']['USD'] += USD_value
 
             # print some info
-            calculated += 1
-            if calculated == next_target:
-                print(str(percent_finished) + '% ...')
-                next_target += interval    # next perent target
-                percent_finished += 20
+            if print_info:
+                calculated += 1
+                if calculated == next_target:
+                    print(str(percent_finished) + '% ...')
+                    next_target += interval    # next perent target
+                    percent_finished += 20
+        if print_info:
+            print('calculated all balance ✔️\n')
 
-        print('calculated all balance ✔️\n')
         return coins
 
     def get_all_coin_balance(self, allow_zero=False):
