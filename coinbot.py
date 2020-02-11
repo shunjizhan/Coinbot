@@ -76,7 +76,7 @@ class Coinbot:
         }
 
         # combine coins in all exchanges
-        all_coins = deepcopy(out_coins)
+        all_coins = {}
         for ex_name, exchange in self.all_exchanges.items():
             if exchange:
                 coins = exchange.get_full_balance(allow_zero=allow_zero)
@@ -109,20 +109,31 @@ class Coinbot:
 
         # add other long term coins
         all_coins = combine_coins(all_coins, other_coins)
+        fixed_coins = variables['fixed_coins']
+        fixed_coins['EOS'] += tp_eos_long           # long term tp_eos
 
-        print('[Total Long Term] =>')
-        show_coins(all_coins, full=full, USD_out=USD_out)
+        print('[Total All] =>')
+        show_coins(all_coins, full=full)
+
+        # print('[Total Long Term] =>')
+        # show_coins(fixed_coins, full=full)
 
         # calculate short term coins
         print('[Total Short Term] =>')
-        fixed_coins = variables['fixed_coins']
-        fixed_coins['EOS'] += tp_eos_long           # long term tp_eos
-        show_coins(all_coins, full=full, USD_out=USD_out, fixed_coins=fixed_coins)
+        show_coins(all_coins, full=full, fixed_coins=fixed_coins)
 
         # profit calculation
-        p('Ratio:   ')
+        p('Ratio: ')
         base = variables['base']
-        print(round(all_coins['total']['USD'] / base, 3))
+        real_total = all_coins['total']['USD'] + USD_out
+        ratio = real_total / base
+        print(
+            "[{}/{}]".format(
+                round(real_total / 10000, 2),
+                round(base / 10000, 2)
+            ),
+            round(ratio, 3)
+        )
 
     def get_all_coin_balance(self, allow_zero=False):
         pprint(self.all_exchanges)

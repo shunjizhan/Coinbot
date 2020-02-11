@@ -58,7 +58,7 @@ def show_coins(coins, full=False, USD_out=0, fixed_coins={}):
         coinslist = sorted(coins.items(), key=lambda kv: kv[1]['USD'], reverse=True)
         for coin, info in coinslist:
             if info['BTC'] != 0:
-                info['ratio'] = round(info['USD'] * 100.0 / (total_USD - USD_out), 1)
+                info['ratio'] = round(info['USD'] * 100.0 / (total_USD), 1)
                 print(coin, info)
     else:
         p(coins['total']['USD'])
@@ -66,7 +66,7 @@ def show_coins(coins, full=False, USD_out=0, fixed_coins={}):
     # 仓位
     if (coins['total']['USD'] > 0) and ('USD' in coins):
         cash = coins['USD']['USD']
-        real_base = coins['total']['USD'] - USD_out      # real_base = total_balance - USD_out
+        real_base = coins['total']['USD']      # real_base = total_balance
         cash_ratio = round(cash * 100.0 / real_base, 1)
     else:
         cash = 0
