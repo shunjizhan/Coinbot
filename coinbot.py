@@ -110,7 +110,8 @@ class Coinbot:
         # add other long term coins
         all_coins = combine_coins(all_coins, other_coins)
         fixed_coins = variables['fixed_coins']
-        fixed_coins['EOS'] += tp_eos_long           # long term tp_eos
+        if 'EOS' in fixed_coins.keys():
+            fixed_coins['EOS'] += tp_eos_long           # long term tp_eos
 
         print('[Total All] =>')
         show_coins(all_coins, full=full)
