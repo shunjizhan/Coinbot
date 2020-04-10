@@ -2,7 +2,6 @@ class Exchange:
     def __init__(self, name):
         self.name = name
         self.market_bases = {'BTC', 'ETH', 'USDT'}
-        self.coins = self.get_all_coin_balance()
         self.dontTouch = {'XRP', 'XEM', 'BTC', 'DOGE', 'SC', 'NEO', 'ZEC', 'BTG', 'MONA', 'WINGS', 'USDT', 'IOTA', 'EOS', 'QTUM', 'ADA', 'XLM', 'LSK', 'BTS', 'XMR', 'DASH', 'SNT', 'BCC', 'BCH', 'SBTC', 'BCX', 'ETF', 'LTC', 'ETH', 'BNB', 'ADA', 'BTS', 'SNT'}
 
     def connect_success(self):

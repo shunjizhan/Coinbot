@@ -14,12 +14,13 @@ from ..coin_market_cap import CoinMarketCap
 
 
 class Huobi(Exchange):
-    def __init__(self, key, secret):
+    def __init__(self, key, secret, name='huobi', get_pool_coins=True):
+        super().__init__('name')
         self.api = HuobiAPI(key, secret)
         self.contract_api = HuobiDM(key, secret)
         self.cmc = CoinMarketCap()
         self.all_pairs = self.get_all_trading_pairs()
-        super().__init__('huobi')
+        self.coins = self.get_all_coin_balance(get_pool_coins=get_pool_coins)
         self.connect_success()
 
     def get_pair(self, coin, base):
@@ -118,7 +119,7 @@ class Huobi(Exchange):
 
         return coins
 
-    def get_all_coin_balance(self, allow_zero=False):
+    def get_all_coin_balance(self, allow_zero=False, get_pool_coins=True):
         coins = defaultdict(float)
 
         # 现货和杠杆账户
@@ -137,11 +138,12 @@ class Huobi(Exchange):
             coins[coin.lower()] += num
 
         # 矿池
-        with open('variables.json') as f:
-            variables = json.load(f)
-        pool_coins = variables['pool_coins']
-        for coin, num in pool_coins.items():
-            coins[coin.lower()] += num
+        if get_pool_coins:
+            with open('variables.json') as f:
+                variables = json.load(f)
+            pool_coins = variables['pool_coins']
+            for coin, num in pool_coins.items():
+                coins[coin.lower()] += num
 
         print('got all coins balance ✔️')
         return dict(coins)

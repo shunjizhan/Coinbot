@@ -21,6 +21,7 @@ class Coinbot:
             # 'gate',
             # 'bithumb',
             'huobi',
+            'dingtou',
             # 'dew'
         }
         self.connect_exchanges()
@@ -37,11 +38,13 @@ class Coinbot:
         key_gate = keys['gate']
         key_bithumb = keys['bithumb']
         key_huobi = keys['huobi']
+        key_dingtou = keys['dingtou']
 
         print('')
 
         self.all_exchanges = {
             'huobi': Huobi(key_huobi['key'], key_huobi['secret']) if self.has_ex('huobi') else None,
+            # 'dingtou': Huobi(key_dingtou['key'a], key_dingtou['secret'], name='dingtou', get_pool_coins=False) if self.has_ex('dingtou') else None,
             # 'bithumb': Bithumb(key_bithumb['key'], key_bithumb['secret']) if self.has_ex('bithumb') else None,
             # 'gate': Gate(key_gate['key'], key_gate['secret']) if self.has_ex('gate') else None,
             # 'dew': Dew() if self.has_ex('dew') else None,
@@ -83,7 +86,7 @@ class Coinbot:
                 # pprint(coins)
                 all_coins = combine_coins(all_coins, coins)
                 p('[' + ex_name + '] => '),
-                show_coins(coins)
+                show_coins(coins, full=True)
 
         # other long term coins
         tp_eos_short = variables['tp_eos_short']
