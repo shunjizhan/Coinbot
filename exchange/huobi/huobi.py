@@ -49,7 +49,15 @@ class Huobi(Exchange):
         return self.get_price('BTC', base='USDT')
 
     def get_price(self, coin, base='BTC', _type=0):
-        if (coin == 'PCX' or coin == 'BNB'):
+        if (coin in set([
+            "PCX",
+            "OCEAN",
+            "FIL",
+            "XOR",
+            "RING",
+            "AR",
+            "KLP",
+        ])):
             return self.cmc.get_price(coin) / self.get_BTC_price()
 
         TYPES = {0: 'bid', 1: 'ask'}
@@ -142,8 +150,8 @@ class Huobi(Exchange):
             with open('variables.json') as f:
                 variables = json.load(f)
             pool_coins = variables['pool_coins']
-            for coin, num in pool_coins.items():
-                coins[coin.lower()] += num
+            for coin, nums in pool_coins.items():
+                coins[coin.lower()] += sum(nums)
 
         print('got all coins balance ✔️')
         return dict(coins)
