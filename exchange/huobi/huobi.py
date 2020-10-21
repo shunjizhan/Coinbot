@@ -57,6 +57,9 @@ class Huobi(Exchange):
             "RING",
             "AR",
             "KLP",
+            "CRU",
+            "EDG",
+            "FIS",
         ])):
             return self.cmc.get_price(coin) / self.get_BTC_price()
 
